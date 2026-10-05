@@ -3,630 +3,702 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jelajah Sad Darsana - Canvas Mode</title>
+    <title>Jelajah Sad Darsana - Game Pembelajaran</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Poppins:wght@500;700;900&display=swap" rel="stylesheet">
     <style>
         body {
-            margin: 0;
-            padding: 0;
-            background-color: #0f172a;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            overflow: hidden;
-            font-family: sans-serif;
-        }
-        #gameCanvas {
+            font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
-            box-shadow: 0 0 20px rgba(0,0,0,0.8);
-            max-width: 100%;
-            max-height: 100vh;
-            /* Aspect ratio 4:3 */
-            aspect-ratio: 4/3;
+            color: #f8fafc;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        h1, h2, h3, h4, .font-poppins {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        /* Custom Game UI Styles */
+        .game-btn {
+            background: linear-gradient(to bottom, #f59e0b, #d97706);
+            border: 2px solid #fbbf24;
+            box-shadow: 0 4px 0 #b45309, 0 5px 15px rgba(0,0,0,0.4);
+            transition: all 0.1s;
+        }
+        .game-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #b45309, 0 2px 5px rgba(0,0,0,0.4);
+        }
+        .game-btn-secondary {
+            background: linear-gradient(to bottom, #3b82f6, #2563eb);
+            border: 2px solid #60a5fa;
+            box-shadow: 0 4px 0 #1d4ed8, 0 5px 15px rgba(0,0,0,0.4);
+        }
+        .game-btn-secondary:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #1d4ed8, 0 2px 5px rgba(0,0,0,0.4);
+        }
+        
+        .panel {
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(10px);
+            border: 2px solid #475569;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        .screen {
+            display: none;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        .screen.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Map Nodes */
+        .node {
+            position: relative;
+            transition: all 0.3s;
+        }
+        .node:hover {
+            transform: scale(1.05);
+        }
+        .node.locked {
+            filter: grayscale(100%) opacity(50%);
+            cursor: not-allowed;
+        }
+        .node.completed .badge {
+            display: flex;
+        }
+        
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* Starry background effect */
+        .stars {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 40px 70px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 50px 160px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 90px 40px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 130px 80px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 160px 120px, #ffffff, rgba(0,0,0,0));
+            background-repeat: repeat;
+            background-size: 200px 200px;
+            animation: twinkle 5s infinite;
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
         }
     </style>
 </head>
-<body>
+<body class="antialiased text-slate-100 selection:bg-amber-500 selection:text-white">
+    <div class="stars"></div>
 
-    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <div class="max-w-4xl mx-auto p-4 min-h-screen flex flex-col justify-center relative" id="app-container">
+        
+        <!-- ================= HOME SCREEN ================= -->
+        <div id="screen-home" class="screen active items-center text-center">
+            <div class="floating mb-6">
+                <i class="fa-solid fa-om text-7xl text-amber-400 drop-shadow-[0_0_15px_rgba(251,191,36,0.8)]"></i>
+            </div>
+            <h1 class="text-4xl md:text-6xl font-black mb-4 text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-yellow-600 drop-shadow-lg">
+                JELAJAH SAD DARSANA
+            </h1>
+            <p class="text-lg md:text-xl text-slate-300 mb-10 max-w-2xl">
+                Temukan hakikat kehidupan, pengetahuan, dan kebenaran melalui 6 sistem filsafat Hindu. Jadilah sang bijaksana!
+            </p>
+            
+            <div class="flex flex-col gap-4 w-full max-w-xs">
+                <button onclick="changeScreen('screen-map')" class="game-btn text-white font-bold py-4 px-6 rounded-xl text-xl uppercase tracking-wider">
+                    <i class="fa-solid fa-play mr-2"></i> Mulai Petualangan
+                </button>
+                <button onclick="changeScreen('screen-tutorial')" class="game-btn-secondary text-white font-bold py-3 px-6 rounded-xl text-lg">
+                    <i class="fa-solid fa-book-open mr-2"></i> Petunjuk & Tujuan
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= TUTORIAL / TUJUAN SCREEN ================= -->
+        <div id="screen-tutorial" class="screen panel p-6 md:p-10 w-full max-w-3xl mx-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold text-amber-400"><i class="fa-solid fa-scroll mr-3"></i>Petunjuk & Tujuan</h2>
+                <button onclick="changeScreen('screen-home')" class="text-slate-400 hover:text-white text-2xl transition"><i class="fa-solid fa-times"></i></button>
+            </div>
+            
+            <div class="space-y-6 overflow-y-auto max-h-[60vh] pr-2 custom-scrollbar">
+                <div>
+                    <h3 class="text-xl font-bold text-blue-300 mb-2 border-b border-slate-600 pb-1">Tujuan Pembelajaran</h3>
+                    <ul class="list-disc pl-5 space-y-1 text-slate-300">
+                        <li>Menjelaskan pengertian Darsana sebagai sistem filsafat Hindu.</li>
+                        <li>Mengidentifikasi enam sistem filsafat Hindu atau Sad Darsana.</li>
+                        <li>Menghubungkan pemikiran Darsana dengan kehidupan sehari-hari.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-green-300 mb-2 border-b border-slate-600 pb-1">Petunjuk Permainan</h3>
+                    <ol class="list-decimal pl-5 space-y-2 text-slate-300">
+                        <li>Awali dengan doa dan niat yang baik.</li>
+                        <li>Pilih level (Darsana) di Peta Penjelajahan. Terdapat 6 level utama.</li>
+                        <li>Pelajari materi pada setiap level: Tokoh, Fokus Pemikiran, dan Penerapan.</li>
+                        <li>Selesaikan <b>Mini Challenge</b> di setiap level untuk mendapatkan XP dan <i>Badge Achievement</i>.</li>
+                        <li>Setelah mengumpulkan 6 Badge, <b>Final Quest</b> akan terbuka!</li>
+                        <li>Raih gelar "Mahaguru Filsafat" dengan menyelesaikan Final Quest.</li>
+                    </ol>
+                </div>
+                <div class="bg-slate-800 p-4 rounded-lg border border-slate-600">
+                    <p class="text-sm italic text-amber-200">"Belajar Darsana bukan hanya memahami pemikiran para filsuf Hindu, tetapi belajar melihat kehidupan dengan lebih sadar, berpikir kritis, dan bertindak bijaksana."</p>
+                </div>
+            </div>
+            
+            <div class="mt-8 text-center">
+                <button onclick="changeScreen('screen-map')" class="game-btn text-white font-bold py-3 px-8 rounded-xl text-lg">
+                    Mengerti, Lanjutkan! <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= MAP SCREEN ================= -->
+        <div id="screen-map" class="screen w-full">
+            <div class="flex justify-between items-center mb-8 bg-slate-800/80 p-4 rounded-xl border border-slate-600 shadow-lg">
+                <div class="flex items-center gap-4">
+                    <button onclick="changeScreen('screen-home')" class="bg-slate-700 hover:bg-slate-600 p-3 rounded-lg transition"><i class="fa-solid fa-house"></i></button>
+                    <div>
+                        <div class="text-sm text-slate-400 font-bold uppercase">Player Stats</div>
+                        <div class="text-amber-400 font-black text-xl"><i class="fa-solid fa-star mr-1"></i> <span id="player-xp">0</span> XP</div>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm text-slate-400 font-bold uppercase">Badges</div>
+                    <div class="text-blue-300 font-black text-xl" id="badge-count">0/6</div>
+                </div>
+            </div>
+
+            <h2 class="text-3xl font-black text-center mb-8 text-white drop-shadow-md">PETA SAD DARSANA</h2>
+
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-10 max-w-3xl mx-auto" id="map-nodes-container">
+                <!-- Nodes generated by JS -->
+            </div>
+
+            <div class="mt-12 text-center">
+                <button id="btn-final-quest" onclick="startFinalQuest()" class="game-btn text-white font-bold py-4 px-10 rounded-xl text-xl locked opacity-50 cursor-not-allowed transition-all">
+                    <i class="fa-solid fa-khanda mr-2"></i> FINAL QUEST <i class="fa-solid fa-lock ml-2" id="final-lock-icon"></i>
+                </button>
+                <p class="text-sm text-slate-400 mt-2" id="final-quest-hint">Kumpulkan 6 Badge untuk membuka rintangan terakhir.</p>
+            </div>
+        </div>
+
+        <!-- ================= LESSON SCREEN ================= -->
+        <div id="screen-lesson" class="screen panel p-6 md:p-8 max-w-3xl w-full mx-auto">
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <span class="bg-amber-500/20 text-amber-300 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide border border-amber-500/50" id="lesson-subtitle">Sistem Filsafat</span>
+                    <h2 class="text-4xl font-black text-white mt-2 flex items-center gap-3">
+                        <i id="lesson-icon" class="fa-solid fa-book text-amber-400"></i>
+                        <span id="lesson-title">Nama Darsana</span>
+                    </h2>
+                </div>
+                <button onclick="changeScreen('screen-map')" class="text-slate-400 hover:text-white text-2xl transition"><i class="fa-solid fa-times"></i></button>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6 mb-8">
+                <div class="bg-slate-800/80 p-5 rounded-xl border border-slate-600">
+                    <h3 class="text-sm text-slate-400 font-bold uppercase mb-1">Tokoh Utama</h3>
+                    <p class="text-xl font-bold text-blue-300" id="lesson-tokoh">Rsi Name</p>
+                </div>
+                <div class="bg-slate-800/80 p-5 rounded-xl border border-slate-600">
+                    <h3 class="text-sm text-slate-400 font-bold uppercase mb-1">Fokus Pemikiran</h3>
+                    <p class="text-lg font-semibold text-white" id="lesson-focus">Focus Area</p>
+                </div>
+            </div>
+
+            <div class="bg-slate-700/50 p-6 rounded-xl border border-slate-600 mb-6">
+                <h3 class="text-lg font-bold text-amber-400 mb-3 flex items-center"><i class="fa-solid fa-lightbulb mr-2"></i> Konsep Utama</h3>
+                <p class="text-slate-200 leading-relaxed text-lg" id="lesson-concept">Concept explanation goes here.</p>
+            </div>
+
+            <div class="bg-indigo-900/40 p-6 rounded-xl border border-indigo-500/50 mb-8">
+                <h3 class="text-lg font-bold text-indigo-300 mb-3 flex items-center"><i class="fa-solid fa-people-arrows mr-2"></i> Penerapan Sehari-hari</h3>
+                <p class="text-slate-300 leading-relaxed italic" id="lesson-application">Application goes here.</p>
+            </div>
+
+            <div class="text-center">
+                <button onclick="startMiniChallenge()" class="game-btn text-white font-bold py-4 px-10 rounded-xl text-lg w-full md:w-auto shadow-[0_0_15px_rgba(251,191,36,0.4)]">
+                    <i class="fa-solid fa-swords mr-2"></i> Mulai Mini Challenge
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= QUIZ / CHALLENGE SCREEN ================= -->
+        <div id="screen-quiz" class="screen panel p-6 md:p-10 max-w-2xl w-full mx-auto text-center">
+            <div class="mb-6 flex justify-between items-center text-sm font-bold text-slate-400 uppercase">
+                <span id="quiz-level-indicator">Level: Nyaya</span>
+                <span><i class="fa-solid fa-star text-amber-400"></i> Reward: 100 XP</span>
+            </div>
+            
+            <div class="mb-8">
+                <h2 class="text-2xl md:text-3xl font-bold text-white mb-6 leading-tight" id="quiz-question">Pertanyaan kuis akan muncul di sini?</h2>
+            </div>
+
+            <div class="grid gap-4" id="quiz-options">
+                <!-- Options generated by JS -->
+            </div>
+            
+            <button onclick="cancelQuiz()" class="mt-8 text-slate-400 hover:text-white underline text-sm">Kembali ke Peta</button>
+        </div>
+
+        <!-- ================= FINAL QUEST SCREEN ================= -->
+        <div id="screen-final-quest" class="screen panel p-6 md:p-10 max-w-2xl w-full mx-auto text-center border-amber-500 shadow-[0_0_30px_rgba(245,158,11,0.3)]">
+            <div class="mb-4 text-amber-400 font-bold uppercase tracking-widest flex justify-center items-center gap-2">
+                <i class="fa-solid fa-skull"></i> FINAL QUEST <i class="fa-solid fa-skull"></i>
+            </div>
+            
+            <div class="flex justify-between items-center mb-6">
+                <div class="text-sm font-bold text-slate-300 bg-slate-800 px-3 py-1 rounded-lg">Soal: <span id="fq-progress">1/5</span></div>
+                <div class="text-sm font-bold text-amber-400 bg-slate-800 px-3 py-1 rounded-lg"><i class="fa-solid fa-heart text-red-500"></i> Nyawa: <span id="fq-lives">3</span></div>
+            </div>
+
+            <div class="mb-8 min-h-[100px] flex items-center justify-center">
+                <h2 class="text-2xl md:text-3xl font-bold text-white leading-tight" id="fq-question">Pertanyaan final quest?</h2>
+            </div>
+
+            <div class="grid gap-4" id="fq-options">
+                <!-- Options generated by JS -->
+            </div>
+        </div>
+
+        <!-- ================= RESULT / REFLECTION SCREEN ================= -->
+        <div id="screen-result" class="screen panel p-6 md:p-10 max-w-3xl w-full mx-auto text-center">
+            <div class="floating mb-4">
+                <i class="fa-solid fa-trophy text-8xl text-amber-400 drop-shadow-[0_0_20px_rgba(251,191,36,0.8)]"></i>
+            </div>
+            <h2 class="text-4xl font-black mb-2 text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-yellow-600">SELAMAT!</h2>
+            <h3 class="text-2xl font-bold text-white mb-6">Anda Meraih Gelar: <span class="text-blue-400">Mahaguru Filsafat</span></h3>
+            
+            <div class="bg-slate-800/80 p-6 rounded-xl border border-slate-600 mb-8 inline-block min-w-[250px]">
+                <div class="text-sm text-slate-400 font-bold uppercase mb-1">Total Skor Akhir</div>
+                <div class="text-5xl font-black text-amber-400"><i class="fa-solid fa-star"></i> <span id="final-score-display">1100</span></div>
+            </div>
+
+            <div class="bg-indigo-900/50 p-6 rounded-xl border border-indigo-500/50 mb-8 text-left">
+                <h3 class="text-xl font-bold text-indigo-300 mb-4 border-b border-indigo-500/50 pb-2"><i class="fa-solid fa-om mr-2"></i> Refleksi Pembelajaran Mendalam</h3>
+                <p class="text-slate-300 mb-4 italic">"Darsana mengajarkan kita untuk melihat kebenaran dengan mata kebijaksanaan. Pengetahuan apa yang paling bermakna bagi Anda hari ini?"</p>
+                <textarea class="w-full bg-slate-800 border border-slate-600 rounded-lg p-3 text-white focus:outline-none focus:border-amber-500 transition" rows="3" placeholder="Tuliskan refleksi singkat Anda di sini (opsional)..."></textarea>
+            </div>
+
+            <button onclick="resetGame()" class="game-btn text-white font-bold py-3 px-8 rounded-xl text-lg">
+                <i class="fa-solid fa-rotate-right mr-2"></i> Mainkan Ulang
+            </button>
+        </div>
+
+    </div>
+
+    <!-- ================= CUSTOM MODAL ================= -->
+    <div id="custom-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 hidden opacity-0 transition-opacity duration-300 backdrop-blur-sm">
+        <div class="panel p-8 max-w-sm w-full mx-4 text-center transform scale-95 transition-transform duration-300" id="modal-content">
+            <div id="modal-icon" class="text-6xl mb-4"></div>
+            <h3 id="modal-title" class="text-2xl font-bold mb-2">Title</h3>
+            <p id="modal-message" class="text-slate-300 mb-6">Message goes here.</p>
+            <button id="modal-btn" class="game-btn text-white font-bold py-2 px-6 rounded-lg w-full">Lanjut</button>
+        </div>
+    </div>
 
     <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        
-        // Logical resolution
-        const GAME_WIDTH = 800;
-        const GAME_HEIGHT = 600;
-
-        // --- GLOBAL STATE ---
-        let state = {
-            scene: 'home', // home, tutorial, map, lesson, quiz, finalQuest, result
-            xp: 0,
-            completed: [],
-            currentLessonId: null,
-            fqCurrentIndex: 0,
-            fqLives: 3,
-            mouseX: 0,
-            mouseY: 0,
-            time: 0,
-            modal: null // {title, msg, type, onClose}
-        };
-
-        // UI Manager for hit detection
-        let uiElements = [];
-
-        // --- DATA ---
+        // --- DATA DEFINITION ---
         const darsanaData = [
             {
-                id: 'nyaya', name: 'Nyaya', icon: '🧠', color: '#60a5fa', 
-                x: 200, y: 250,
-                tokoh: 'Rsi Gautama',
-                focus: 'Logika & Penalaran',
-                concept: 'Nyaya adalah sistem filsafat yang menitikberatkan pada logika dan analisis. Mengajarkan cara berpikir logis, membedakan pengetahuan yang benar dan keliru (Pramana).',
-                application: 'Memeriksa sumber dan bukti sebelum mempercayai informasi/berita hoaks.',
+                id: 'nyaya',
+                name: 'Nyaya',
+                icon: 'fa-brain',
+                color: 'text-blue-400',
+                bgClass: 'bg-blue-900/50 hover:bg-blue-800/80 border-blue-500',
+                tokoh: 'Rsi Gautama (Aksapada Gautama)',
+                focus: 'Logika, Penalaran & Pengetahuan Benar',
+                concept: 'Nyaya adalah sistem filsafat yang menitikberatkan pada logika dan analisis. Mengajarkan cara berpikir logis, membedakan pengetahuan yang benar dan keliru, serta menarik kesimpulan berdasarkan alasan yang tepat (Pramana).',
+                application: 'Sebelum mempercayai informasi (hoaks) di media sosial, kita harus memeriksa sumber, bukti, dan alasan logis yang mendukung informasi tersebut.',
                 badge: 'Sang Pemikir',
                 quiz: {
-                    q: 'Menganalisis informasi dengan logika adalah penerapan ajaran...',
-                    opts: ['Yoga', 'Nyaya', 'Mimamsa', 'Vedanta'],
-                    ans: 1
+                    question: 'Jika kamu menganalisis sebuah informasi untuk membedakan mana yang benar dan keliru menggunakan logika, pemikiran Darsana apa yang sedang kamu terapkan?',
+                    options: ['Yoga', 'Nyaya', 'Mimamsa', 'Vedanta'],
+                    correct: 1 // index of correct answer
                 }
             },
             {
-                id: 'vaiseshika', name: 'Vaiseshika', icon: '🧱', color: '#34d399',
-                x: 400, y: 250,
+                id: 'vaiseshika',
+                name: 'Vaiseshika',
+                icon: 'fa-cubes',
+                color: 'text-emerald-400',
+                bgClass: 'bg-emerald-900/50 hover:bg-emerald-800/80 border-emerald-500',
                 tokoh: 'Rsi Kanada',
                 focus: 'Hakikat Realitas & Kategori',
-                concept: 'Memberikan perhatian terhadap hakikat alam semesta dan mengelompokkan kategori materi. Teori atom (Paramanu) berasal dari ajaran ini.',
-                application: 'Kemampuan mengelompokkan dan berpikir sistematis saat melakukan penelitian.',
+                concept: 'Memberikan perhatian terhadap hakikat realitas (alam semesta) dan mengelompokkan berbagai kategori materi yang ada di dalamnya secara sistematis. Teori atom (Paramanu) berasal dari ajaran ini.',
+                application: 'Kemampuan mengelompokkan, mengidentifikasi objek, dan berpikir sistematis saat melakukan penelitian atau mengorganisir tugas sekolah.',
                 badge: 'Sang Pengamat',
                 quiz: {
-                    q: 'Tokoh yang mengajarkan pengkategorian realitas (Vaiseshika) adalah...',
-                    opts: ['Rsi Patanjali', 'Rsi Jaimini', 'Rsi Kanada', 'Rsi Kapila'],
-                    ans: 2
+                    question: 'Tokoh yang dikenal menyusun sistem filsafat Vaiseshika dan mengajarkan pengkategorian realitas adalah...',
+                    options: ['Rsi Patanjali', 'Rsi Jaimini', 'Rsi Kanada', 'Rsi Kapila'],
+                    correct: 2
                 }
             },
             {
-                id: 'samkhya', name: 'Samkhya', icon: '☯️', color: '#c084fc',
-                x: 600, y: 250,
+                id: 'samkhya',
+                name: 'Samkhya',
+                icon: 'fa-yin-yang',
+                color: 'text-purple-400',
+                bgClass: 'bg-purple-900/50 hover:bg-purple-800/80 border-purple-500',
                 tokoh: 'Rsi Kapila',
-                focus: 'Purusa & Prakrti',
-                concept: 'Menjelaskan realitas terbentuk dari Purusa (asas kesadaran/roh) dan Prakrti (asas materi). Ini adalah filsafat tertua.',
-                application: 'Menyadari hidup butuh keseimbangan materi dan kesadaran spiritual.',
+                focus: 'Dualisme: Purusa & Prakrti',
+                concept: 'Menjelaskan realitas alam semesta terbentuk dari pertemuan dua prinsip abadi: Purusa (asas kesadaran/roh) dan Prakrti (asas materi/alam). Samkhya adalah filsafat tertua.',
+                application: 'Menyadari bahwa kehidupan tidak hanya berpusat pada kepuasan materi (Prakrti), tetapi juga membutuhkan kedamaian batin dan kesadaran spiritual (Purusa).',
                 badge: 'Sang Penyelaras',
                 quiz: {
-                    q: 'Dua prinsip utama pembentukan alam semesta menurut Samkhya adalah...',
-                    opts: ['Dharma & Adharma', 'Purusa & Prakrti', 'Atman & Brahman', 'Sruti & Smerti'],
-                    ans: 1
+                    question: 'Dua prinsip utama yang menjadi dasar pembentukan alam semesta menurut filsafat Samkhya adalah...',
+                    options: ['Dharma dan Adharma', 'Purusa dan Prakrti', 'Atman dan Brahman', 'Sruti dan Smerti'],
+                    correct: 1
                 }
             },
             {
-                id: 'yoga', name: 'Yoga', icon: '🧘', color: '#2dd4bf',
-                x: 200, y: 420,
+                id: 'yoga',
+                name: 'Yoga',
+                icon: 'fa-spa',
+                color: 'text-teal-400',
+                bgClass: 'bg-teal-900/50 hover:bg-teal-800/80 border-teal-500',
                 tokoh: 'Rsi Patanjali',
-                focus: 'Disiplin & Pengendalian',
-                concept: 'Erat dengan praktik disiplin, pengendalian pikiran, konsentrasi, dan meditasi untuk mencapai kelepasan (Moksa).',
-                application: 'Mengendalikan emosi saat marah dan fokus saat belajar.',
+                focus: 'Disiplin & Pengendalian Diri',
+                concept: 'Sistem filsafat yang sangat erat praktiknya dengan ajaran disiplin, pengendalian pikiran, konsentrasi, dan meditasi untuk mencapai keadaan spiritual yang lebih tinggi (Moksa).',
+                application: 'Mengendalikan emosi saat marah (misal saat dikritik), mengatur pikiran agar fokus saat belajar, dan membangun kebiasaan hidup yang disiplin.',
                 badge: 'Sang Petapa',
                 quiz: {
-                    q: 'Filsafat yang erat dengan meditasi dan pengendalian diri adalah...',
-                    opts: ['Nyaya', 'Vaiseshika', 'Mimamsa', 'Yoga'],
-                    ans: 3
+                    question: 'Sistem filsafat yang sangat erat dengan praktik pengendalian pikiran, konsentrasi, meditasi, dan disiplin diri adalah...',
+                    options: ['Nyaya', 'Vaiseshika', 'Mimamsa', 'Yoga'],
+                    correct: 3
                 }
             },
             {
-                id: 'mimamsa', name: 'Mimamsa', icon: '🔥', color: '#fb923c',
-                x: 400, y: 420,
+                id: 'mimamsa',
+                name: 'Mimamsa',
+                icon: 'fa-fire-flame-curved',
+                color: 'text-orange-400',
+                bgClass: 'bg-orange-900/50 hover:bg-orange-800/80 border-orange-500',
                 tokoh: 'Rsi Jaimini',
-                focus: 'Kewajiban & Ritual',
-                concept: 'Fokus pada bagian Karma Kanda dari Weda. Menekankan pentingnya pelaksanaan kewajiban (Dharma) dan tindakan keagamaan.',
-                application: 'Melaksanakan kewajiban sebagai siswa dan sembahyang dengan tulus.',
+                focus: 'Weda, Kewajiban & Ritual',
+                concept: 'Memberikan perhatian penuh pada bagian Karma Kanda dari Weda. Menekankan pentingnya pelaksanaan kewajiban (Dharma) dan tindakan keagamaan (Yadnya) secara benar.',
+                application: 'Menerapkan nilai tanggung jawab dengan melaksanakan kewajiban sebagai siswa, menghormati orang tua/guru, dan sembahyang dengan sungguh-sungguh.',
                 badge: 'Sang Pelaksana',
                 quiz: {
-                    q: 'Fokus utama dari ajaran Mimamsa (Rsi Jaimini) adalah...',
-                    opts: ['Meditasi', 'Logika', 'Pelaksanaan kewajiban (Dharma)', 'Pembebasan'],
-                    ans: 2
+                    question: 'Fokus utama dari ajaran Mimamsa yang diajarkan oleh Rsi Jaimini adalah...',
+                    options: ['Meditasi dan pengendalian napas', 'Logika dan debat', 'Pelaksanaan kewajiban (Dharma) berdasarkan Weda', 'Pembebasan melalui pengetahuan (Jnana)'],
+                    correct: 2
                 }
             },
             {
-                id: 'vedanta', name: 'Vedanta', icon: '♾️', color: '#fb7185',
-                x: 600, y: 420,
-                tokoh: 'Badarayana (Vyasa)',
-                focus: 'Realitas Tertinggi',
-                concept: 'Vedanta berarti "akhir Weda" (Upanisad). Membahas hakikat Atman (jiwa), Brahman (Tuhan), dan pembebasan abadi.',
-                application: 'Melakukan refleksi diri mengenai hakikat diri dan hubungan dengan Tuhan.',
+                id: 'vedanta',
+                name: 'Vedanta',
+                icon: 'fa-infinity',
+                color: 'text-rose-400',
+                bgClass: 'bg-rose-900/50 hover:bg-rose-800/80 border-rose-500',
+                tokoh: 'Badarayana (Rsi Vyasa)',
+                focus: 'Realitas Tertinggi (Upanisad)',
+                concept: 'Vedanta berarti "akhir dari Weda" (berhubungan dengan Upanisad). Membahas persoalan filosofis tertinggi mengenai Atman (jiwa individu), Brahman (Tuhan/realitas tertinggi), dan pembebasan.',
+                application: 'Melakukan refleksi diri secara mendalam mengenai hakikat diri "Siapakah saya?", hubungan dengan Tuhan, serta tujuan tertinggi kehidupan manusia.',
                 badge: 'Sang Bijaksana',
                 quiz: {
-                    q: 'Vedanta sangat erat hubungannya dengan bagian akhir Weda, yaitu...',
-                    opts: ['Reg Veda', 'Ayurveda', 'Upanisad', 'Purana'],
-                    ans: 2
+                    question: 'Vedanta merupakan sistem filsafat yang memiliki hubungan erat dengan bagian akhir Weda, khususnya...',
+                    options: ['Reg Veda', 'Ayurveda', 'Upanisad', 'Purana'],
+                    correct: 2
                 }
             }
         ];
 
         const finalQuestData = [
             {
-                q: "Istilah untuk 6 sistem filsafat Hindu adalah...",
+                q: "Istilah yang digunakan untuk menyebut 6 sistem filsafat dalam tradisi Hindu adalah...",
                 opts: ["Catur Marga", "Sad Darsana", "Panca Sradha", "Tri Hita Karana"],
                 ans: 1
             },
             {
-                q: "Pasangan tokoh dan aliran yang BENAR adalah...",
+                q: "Pasangan tokoh dan aliran Darsana yang BENAR di bawah ini adalah...",
                 opts: ["Rsi Kanada - Yoga", "Rsi Gautama - Samkhya", "Rsi Patanjali - Yoga", "Rsi Jaimini - Vaiseshika"],
                 ans: 2
             },
             {
-                q: "Belajar daripada main game karena sadar kewajiban mencerminkan Darsana...",
+                q: "Jika seorang siswa memutuskan untuk belajar daripada bermain game karena sadar akan kewajibannya, nilai Darsana manakah yang paling mencerminkan penekanan pada pelaksanaan kewajiban?",
                 opts: ["Mimamsa", "Nyaya", "Vedanta", "Vaiseshika"],
                 ans: 0
+            },
+            {
+                q: "Dalam Samkhya, prinsip kesadaran rohani disebut..., sedangkan prinsip materi/alam disebut...",
+                opts: ["Atman - Brahman", "Purusa - Prakrti", "Dharma - Karma", "Yoga - Bhakti"],
+                ans: 1
+            },
+            {
+                q: "Makna utama mempelajari Darsana bagi kehidupan remaja masa kini adalah...",
+                opts: ["Menjadi pandai berdebat untuk mengalahkan orang lain", "Meninggalkan dunia dan hidup di hutan", "Menghafal seluruh kitab suci tanpa henti", "Mengembangkan pikiran kritis, sadar, dan bertindak bijaksana"],
+                ans: 3
             }
         ];
 
-        // --- BACKGROUND PARTICLES ---
-        const stars = Array.from({length: 100}, () => ({
-            x: Math.random() * GAME_WIDTH,
-            y: Math.random() * GAME_HEIGHT,
-            size: Math.random() * 2,
-            speed: Math.random() * 0.5 + 0.1
-        }));
-
-        // --- DRAWING HELPERS ---
-        function drawRoundRect(x, y, w, h, radius, fill, stroke = null, shadow = false) {
-            ctx.beginPath();
-            ctx.moveTo(x + radius, y);
-            ctx.lineTo(x + w - radius, y);
-            ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
-            ctx.lineTo(x + w, y + h - radius);
-            ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
-            ctx.lineTo(x + radius, y + h);
-            ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
-            ctx.lineTo(x, y + radius);
-            ctx.quadraticCurveTo(x, y, x + radius, y);
-            ctx.closePath();
-            
-            if (shadow) {
-                ctx.shadowColor = 'rgba(0,0,0,0.5)';
-                ctx.shadowBlur = 10;
-                ctx.shadowOffsetY = 5;
-            } else {
-                ctx.shadowColor = 'transparent';
-                ctx.shadowBlur = 0;
-                ctx.shadowOffsetY = 0;
-            }
-
-            if (fill) {
-                ctx.fillStyle = fill;
-                ctx.fill();
-            }
-            if (stroke) {
-                ctx.strokeStyle = stroke;
-                ctx.lineWidth = 2;
-                ctx.stroke();
-            }
-            ctx.shadowColor = 'transparent'; // reset
-        }
-
-        function drawText(text, x, y, font, color, align = 'left', baseline = 'top') {
-            ctx.font = font;
-            ctx.fillStyle = color;
-            ctx.textAlign = align;
-            ctx.textBaseline = baseline;
-            ctx.fillText(text, x, y);
-        }
-
-        function wrapText(text, x, y, maxWidth, lineHeight, font, color, align='left') {
-            ctx.font = font;
-            ctx.fillStyle = color;
-            ctx.textAlign = align;
-            ctx.textBaseline = 'top';
-            
-            let words = text.split(' ');
-            let line = '';
-            let currentY = y;
-
-            for(let n = 0; n < words.length; n++) {
-                let testLine = line + words[n] + ' ';
-                let metrics = ctx.measureText(testLine);
-                let testWidth = metrics.width;
-                
-                if (testWidth > maxWidth && n > 0) {
-                    ctx.fillText(line, align === 'center' ? x + maxWidth/2 : x, currentY);
-                    line = words[n] + ' ';
-                    currentY += lineHeight;
-                } else {
-                    line = testLine;
-                }
-            }
-            ctx.fillText(line, align === 'center' ? x + maxWidth/2 : x, currentY);
-            return currentY + lineHeight;
-        }
-
-        // --- UI COMPONENT BUILDER ---
-        function addButton(text, x, y, w, h, bgPrimary, bgHover, textColor, onClick) {
-            const isHover = state.mouseX >= x && state.mouseX <= x + w && 
-                            state.mouseY >= y && state.mouseY <= y + h && !state.modal;
-            
-            const currentBg = isHover ? bgHover : bgPrimary;
-            const offsetY = isHover ? 2 : 0;
-            
-            drawRoundRect(x, y + offsetY, w, h, 15, currentBg, null, !isHover);
-            drawText(text, x + w/2, y + h/2 + offsetY, "bold 20px Arial", textColor, "center", "middle");
-
-            uiElements.push({x, y, w, h, onClick});
-        }
-
-        // --- SCENES ---
-        function renderHome() {
-            // Title Animation
-            const floatY = Math.sin(state.time * 0.005) * 10;
-            
-            drawText('🕉️', GAME_WIDTH/2, 120 + floatY, '60px Arial', '#fbbf24', 'center');
-            
-            ctx.font = "bold 48px Arial";
-            ctx.textAlign = "center";
-            // Gradient text
-            let gradient = ctx.createLinearGradient(0, 150, 0, 220);
-            gradient.addColorStop(0, "#fde68a");
-            gradient.addColorStop(0.5, "#fbbf24");
-            gradient.addColorStop(1, "#d97706");
-            ctx.fillStyle = gradient;
-            ctx.fillText("JELAJAH SAD DARSANA", GAME_WIDTH/2, 220);
-
-            wrapText("Temukan hakikat kehidupan, pengetahuan, dan kebenaran melalui 6 sistem filsafat Hindu. Jadilah sang bijaksana!", 150, 260, 500, 24, "18px Arial", "#cbd5e1", "center");
-
-            addButton("MULAI PETUALANGAN", GAME_WIDTH/2 - 150, 360, 300, 60, "#d97706", "#b45309", "#ffffff", () => {
-                state.scene = 'map';
-            });
-
-            addButton("PETUNJUK", GAME_WIDTH/2 - 100, 440, 200, 50, "#2563eb", "#1d4ed8", "#ffffff", () => {
-                state.scene = 'tutorial';
-            });
-        }
-
-        function renderTutorial() {
-            drawRoundRect(100, 50, 600, 500, 20, "rgba(30, 41, 59, 0.9)", "#475569", true);
-            drawText("📜 Petunjuk & Tujuan", 400, 80, "bold 28px Arial", "#fbbf24", "center");
-            
-            let y = 140;
-            drawText("Tujuan Pembelajaran:", 140, y, "bold 20px Arial", "#93c5fd");
-            y += 30;
-            wrapText("- Menjelaskan pengertian Darsana.", 140, y, 520, 24, "16px Arial", "#e2e8f0"); y += 24;
-            wrapText("- Mengidentifikasi 6 sistem filsafat Hindu.", 140, y, 520, 24, "16px Arial", "#e2e8f0"); y += 24;
-            wrapText("- Menghubungkan pemikiran dengan keseharian.", 140, y, 520, 24, "16px Arial", "#e2e8f0"); y += 40;
-
-            drawText("Cara Bermain:", 140, y, "bold 20px Arial", "#6ee7b7");
-            y += 30;
-            wrapText("1. Pilih level (Darsana) di Peta Penjelajahan.", 140, y, 520, 24, "16px Arial", "#e2e8f0"); y += 24;
-            wrapText("2. Pelajari materi dan selesaikan Mini Challenge.", 140, y, 520, 24, "16px Arial", "#e2e8f0"); y += 24;
-            wrapText("3. Kumpulkan 6 Badge untuk membuka Final Quest.", 140, y, 520, 24, "16px Arial", "#e2e8f0"); y += 24;
-
-            addButton("MENGERTI", 300, 470, 200, 50, "#d97706", "#b45309", "#ffffff", () => {
-                state.scene = 'home';
-            });
-        }
-
-        function renderMap() {
-            // Header Stats
-            drawRoundRect(20, 20, 760, 60, 10, "rgba(30, 41, 59, 0.8)", "#475569");
-            
-            // Home button inside header
-            addButton("🏠", 30, 30, 40, 40, "#475569", "#334155", "#fff", () => state.scene = 'home');
-            
-            drawText("PLAYER STATS", 90, 30, "bold 12px Arial", "#94a3b8");
-            drawText(`⭐ ${state.xp} XP`, 90, 45, "bold 20px Arial", "#fbbf24");
-            
-            drawText("BADGES", 740, 30, "bold 12px Arial", "#94a3b8", "right");
-            drawText(`${state.completed.length}/6`, 740, 45, "bold 20px Arial", "#93c5fd", "right");
-
-            drawText("PETA SAD DARSANA", 400, 120, "black 32px Arial", "#ffffff", "center");
-
-            // Draw Nodes
-            darsanaData.forEach(node => {
-                const isCompleted = state.completed.includes(node.id);
-                const r = 45;
-                const isHover = !state.modal && Math.hypot(state.mouseX - node.x, state.mouseY - node.y) < r;
-                const currentR = isHover ? r + 5 : r;
-
-                // Connection line (visual only, from center top)
-                ctx.beginPath();
-                ctx.moveTo(400, 150);
-                ctx.lineTo(node.x, node.y - currentR);
-                ctx.strokeStyle = "rgba(255,255,255,0.1)";
-                ctx.lineWidth = 2;
-                ctx.stroke();
-
-                // Circle Background
-                ctx.beginPath();
-                ctx.arc(node.x, node.y, currentR, 0, Math.PI * 2);
-                ctx.fillStyle = isCompleted ? "#334155" : "rgba(30,41,59,0.9)";
-                ctx.fill();
-                ctx.strokeStyle = isCompleted ? "#fbbf24" : node.color;
-                ctx.lineWidth = 4;
-                ctx.stroke();
-
-                // Icon & Text
-                drawText(node.icon, node.x, node.y, `${isHover ? 40 : 36}px Arial`, "#fff", "center", "middle");
-                drawText(node.name, node.x, node.y + r + 15, "bold 16px Arial", isCompleted ? "#fbbf24" : "#e2e8f0", "center");
-
-                if (isCompleted) {
-                    drawText("✅", node.x + r - 10, node.y + r - 10, "16px Arial", "#fff", "center", "middle");
-                }
-
-                // Add to UI elements (using bounding box for simplicity)
-                uiElements.push({
-                    x: node.x - r, y: node.y - r, w: r*2, h: r*2,
-                    onClick: () => {
-                        state.currentLessonId = node.id;
-                        state.scene = 'lesson';
-                    }
-                });
-            });
-
-            // Final Quest Button
-            const fqUnlocked = state.completed.length >= 6;
-            if (fqUnlocked) {
-                addButton("⚔️ FINAL QUEST", 250, 520, 300, 50, "#dc2626", "#b91c1c", "#ffffff", () => {
-                    state.fqCurrentIndex = 0;
-                    state.fqLives = 3;
-                    state.scene = 'finalQuest';
-                });
-            } else {
-                drawRoundRect(250, 520, 300, 50, 15, "#475569", null);
-                drawText("🔒 FINAL QUEST", 400, 545, "bold 20px Arial", "#94a3b8", "center", "middle");
-                drawText("Kumpulkan 6 Badge untuk membuka", 400, 585, "14px Arial", "#94a3b8", "center");
-            }
-        }
-
-        function renderLesson() {
-            const data = darsanaData.find(d => d.id === state.currentLessonId);
-            if(!data) return;
-
-            drawRoundRect(50, 40, 700, 520, 20, "rgba(30, 41, 59, 0.95)", "#475569", true);
-            
-            // Close btn
-            addButton("✖", 700, 50, 30, 30, "transparent", "#ef4444", "#94a3b8", () => state.scene = 'map');
-
-            drawText("Sistem Filsafat", 80, 70, "bold 14px Arial", "#fbbf24");
-            drawText(`${data.icon} ${data.name}`, 80, 100, "bold 36px Arial", "#ffffff");
-
-            // Info Boxes
-            drawRoundRect(80, 140, 310, 80, 10, "rgba(15, 23, 42, 0.8)", "#475569");
-            drawText("Tokoh Utama", 100, 155, "bold 12px Arial", "#94a3b8");
-            drawText(data.tokoh, 100, 175, "bold 20px Arial", "#93c5fd");
-
-            drawRoundRect(410, 140, 310, 80, 10, "rgba(15, 23, 42, 0.8)", "#475569");
-            drawText("Fokus Pemikiran", 430, 155, "bold 12px Arial", "#94a3b8");
-            drawText(data.focus, 430, 175, "bold 18px Arial", "#ffffff");
-
-            // Content
-            drawRoundRect(80, 240, 640, 110, 10, "rgba(51, 65, 85, 0.5)", "#475569");
-            drawText("💡 Konsep Utama", 100, 255, "bold 16px Arial", "#fbbf24");
-            wrapText(data.concept, 100, 285, 600, 22, "16px Arial", "#e2e8f0");
-
-            drawRoundRect(80, 370, 640, 80, 10, "rgba(49, 46, 129, 0.4)", "#4f46e5");
-            drawText("🔄 Penerapan Sehari-hari", 100, 385, "bold 16px Arial", "#a5b4fc");
-            wrapText(data.application, 100, 415, 600, 22, "italic 16px Arial", "#cbd5e1");
-
-            addButton("⚔️ MULAI CHALLENGE", 250, 480, 300, 50, "#d97706", "#b45309", "#ffffff", () => {
-                state.scene = 'quiz';
-            });
-        }
-
-        function renderQuiz() {
-            const data = darsanaData.find(d => d.id === state.currentLessonId);
-            
-            drawRoundRect(100, 60, 600, 480, 20, "rgba(30, 41, 59, 0.95)", "#475569", true);
-            
-            drawText(`Tantangan: ${data.name}`, 130, 80, "bold 14px Arial", "#94a3b8");
-            drawText(`⭐ Reward: 100 XP`, 670, 80, "bold 14px Arial", "#fbbf24", "right");
-
-            // Question
-            wrapText(data.quiz.q, 400, 130, 500, 30, "bold 24px Arial", "#ffffff", "center");
-
-            // Options
-            data.quiz.opts.forEach((opt, idx) => {
-                const y = 250 + (idx * 60);
-                addButton(opt, 150, y, 500, 50, "#1e293b", "#334155", "#e2e8f0", () => handleQuizAnswer(idx, data.quiz.ans, data));
-            });
-
-            addButton("Kembali", 350, 510, 100, 30, "transparent", "#334155", "#94a3b8", () => state.scene = 'lesson');
-        }
-
-        function handleQuizAnswer(selected, correct, data) {
-            if(selected === correct) {
-                let xpGain = 0;
-                if(!state.completed.includes(data.id)) {
-                    state.completed.push(data.id);
-                    state.xp += 100;
-                    xpGain = 100;
-                }
-                showModal("Benar!", `Anda mendapatkan Badge "${data.badge}"${xpGain ? ' & 100 XP' : ''}`, "success", () => state.scene = 'map');
-            } else {
-                showModal("Kurang Tepat", "Silakan pelajari lagi konsepnya.", "error", () => state.scene = 'lesson');
-            }
-        }
-
-        function renderFinalQuest() {
-            const qData = finalQuestData[state.fqCurrentIndex];
-            
-            drawRoundRect(100, 60, 600, 480, 20, "rgba(30, 41, 59, 0.95)", "#fbbf24", true);
-            
-            drawText(`💀 FINAL QUEST 💀`, 400, 90, "bold 20px Arial", "#fbbf24", "center");
-            
-            drawRoundRect(130, 120, 80, 30, 5, "#1e293b");
-            drawText(`Soal: ${state.fqCurrentIndex + 1}/${finalQuestData.length}`, 140, 127, "bold 14px Arial", "#cbd5e1");
-            
-            drawRoundRect(570, 120, 100, 30, 5, "#1e293b");
-            drawText(`❤️ Nyawa: ${state.fqLives}`, 580, 127, "bold 14px Arial", "#f87171");
-
-            wrapText(qData.q, 400, 180, 520, 28, "bold 22px Arial", "#ffffff", "center");
-
-            qData.opts.forEach((opt, idx) => {
-                const y = 280 + (idx * 55);
-                addButton(`${String.fromCharCode(65 + idx)}. ${opt}`, 150, y, 500, 45, "#1e293b", "#3b82f6", "#e2e8f0", () => {
-                    if (idx === qData.ans) {
-                        state.fqCurrentIndex++;
-                        if (state.fqCurrentIndex >= finalQuestData.length) {
-                            state.xp += 500;
-                            state.scene = 'result';
-                        } else {
-                            showModal("Tepat!", "Lanjut ke soal berikutnya.", "success", null);
-                        }
-                    } else {
-                        state.fqLives--;
-                        if (state.fqLives <= 0) {
-                            showModal("Gagal", "Nyawa habis! Coba lagi dari awal.", "error", () => state.scene = 'map');
-                        } else {
-                            showModal("Salah", `Sisa nyawa: ${state.fqLives}`, "error", null);
-                        }
-                    }
-                });
-            });
-        }
-
-        function renderResult() {
-            const floatY = Math.sin(state.time * 0.005) * 10;
-            
-            drawText('🏆', GAME_WIDTH/2, 100 + floatY, '80px Arial', '#fbbf24', 'center');
-            
-            let gradient = ctx.createLinearGradient(0, 180, 0, 240);
-            gradient.addColorStop(0, "#fde68a");
-            gradient.addColorStop(1, "#d97706");
-            ctx.fillStyle = gradient;
-            ctx.font = "black 48px Arial";
-            ctx.textAlign = "center";
-            ctx.fillText("SELAMAT!", GAME_WIDTH/2, 220);
-
-            drawText("Anda Meraih Gelar:", GAME_WIDTH/2, 260, "bold 24px Arial", "#ffffff", "center");
-            drawText("Mahaguru Filsafat", GAME_WIDTH/2, 290, "bold 28px Arial", "#60a5fa", "center");
-
-            drawRoundRect(300, 330, 200, 100, 15, "rgba(30, 41, 59, 0.8)", "#475569");
-            drawText("Total Skor", 400, 350, "bold 14px Arial", "#94a3b8", "center");
-            drawText(`⭐ ${state.xp}`, 400, 380, "bold 36px Arial", "#fbbf24", "center");
-
-            addButton("MAINKAN ULANG", 300, 470, 200, 50, "#0ea5e9", "#0284c7", "#ffffff", () => {
-                state.scene = 'home';
-                state.xp = 0;
-                state.completed = [];
-                state.currentLessonId = null;
-            });
-        }
-
-        function renderModal() {
-            if(!state.modal) return;
-            
-            // Backdrop
-            ctx.fillStyle = "rgba(0,0,0,0.7)";
-            ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-
-            // Box
-            drawRoundRect(250, 200, 300, 200, 15, "#1e293b", "#475569", true);
-            
-            let titleColor = "#60a5fa"; // info
-            if(state.modal.type === 'success') titleColor = "#4ade80";
-            if(state.modal.type === 'error') titleColor = "#f87171";
-
-            drawText(state.modal.title, 400, 230, "bold 24px Arial", titleColor, "center");
-            wrapText(state.modal.msg, 400, 270, 260, 20, "16px Arial", "#e2e8f0", "center");
-
-            // The button uses the main UI loop, so we need to add it to uiElements
-            addButton("Lanjut", 325, 330, 150, 40, "#3b82f6", "#2563eb", "#fff", () => {
-                const cb = state.modal.onClose;
-                state.modal = null;
-                if(cb) cb();
-            });
-        }
-
-        function showModal(title, msg, type, onClose) {
-            state.modal = {title, msg, type, onClose};
-        }
-
-        // --- INPUT HANDLING ---
-        canvas.addEventListener('mousemove', (e) => {
-            const rect = canvas.getBoundingClientRect();
-            // Calculate scale based on actual rendered size vs logical size
-            const scaleX = canvas.width / rect.width;
-            const scaleY = canvas.height / rect.height;
-            
-            state.mouseX = (e.clientX - rect.left) * scaleX;
-            state.mouseY = (e.clientY - rect.top) * scaleY;
-            
-            // Cursor changing
-            let hovering = false;
-            if(!state.modal) {
-                for(let el of uiElements) {
-                    if(state.mouseX >= el.x && state.mouseX <= el.x + el.w &&
-                       state.mouseY >= el.y && state.mouseY <= el.y + el.h) {
-                        hovering = true;
-                        break;
-                    }
-                }
-            } else {
-                // If modal is active, only modal buttons should trigger hover
-                hovering = true; // simplifying logic for modal button
-            }
-            canvas.style.cursor = hovering ? 'pointer' : 'default';
-        });
-
-        canvas.addEventListener('click', (e) => {
-            // Traverse uiElements backwards (top-most elements first)
-            for(let i = uiElements.length - 1; i >= 0; i--) {
-                const el = uiElements[i];
-                if(state.mouseX >= el.x && state.mouseX <= el.x + el.w &&
-                   state.mouseY >= el.y && state.mouseY <= el.y + el.h) {
-                    el.onClick();
-                    break; // Only click top element
-                }
-            }
-        });
-
-        // --- MAIN LOOP ---
-        function drawBackground() {
-            ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-            
-            // Draw Stars
-            ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-            stars.forEach(star => {
-                star.y -= star.speed;
-                if (star.y < 0) star.y = GAME_HEIGHT;
-                
-                // Twinkle
-                ctx.globalAlpha = 0.5 + Math.sin(state.time * 0.01 + star.x) * 0.5;
-                ctx.beginPath();
-                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
-                ctx.fill();
-            });
-            ctx.globalAlpha = 1.0;
-        }
-
-        function gameLoop(timestamp) {
-            state.time = timestamp;
-            uiElements = []; // Reset clickable regions for this frame
-
-            drawBackground();
-
-            switch(state.scene) {
-                case 'home': renderHome(); break;
-                case 'tutorial': renderTutorial(); break;
-                case 'map': renderMap(); break;
-                case 'lesson': renderLesson(); break;
-                case 'quiz': renderQuiz(); break;
-                case 'finalQuest': renderFinalQuest(); break;
-                case 'result': renderResult(); break;
-            }
-
-            if (state.modal) {
-                // Clear UI elements under modal so they can't be clicked
-                uiElements = []; 
-                renderModal();
-            }
-
-            requestAnimationFrame(gameLoop);
-        }
-
-        // Start engine
-        window.onload = function() {
-            requestAnimationFrame(gameLoop);
+        // --- STATE MANAGEMENT ---
+        let gameState = {
+            xp: 0,
+            completed: [],
+            currentLessonId: null,
+            fqCurrentIndex: 0,
+            fqLives: 3
         };
+
+        // --- UI FUNCTIONS ---
+        function changeScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            
+            if(screenId === 'screen-map') {
+                updateMapUI();
+            }
+        }
+
+        function updateMapUI() {
+            document.getElementById('player-xp').textContent = gameState.xp;
+            document.getElementById('badge-count').textContent = `${gameState.completed.length}/6`;
+
+            const container = document.getElementById('map-nodes-container');
+            container.innerHTML = '';
+
+            darsanaData.forEach(darsana => {
+                const isCompleted = gameState.completed.includes(darsana.id);
+                
+                const nodeHTML = `
+                    <div class="node flex flex-col items-center cursor-pointer ${isCompleted ? 'completed' : ''}" onclick="openLesson('${darsana.id}')">
+                        <div class="w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center text-3xl md:text-4xl shadow-lg border-4 ${darsana.bgClass} relative">
+                            <i class="fa-solid ${darsana.icon} ${darsana.color}"></i>
+                            ${isCompleted ? `<div class="badge absolute -bottom-2 -right-2 bg-amber-500 text-white text-xs font-bold px-2 py-1 rounded shadow border border-yellow-300 hidden"><i class="fa-solid fa-check mr-1"></i>Clear</div>` : ''}
+                        </div>
+                        <div class="mt-3 font-bold text-center ${isCompleted ? 'text-amber-400' : 'text-slate-300'}">${darsana.name}</div>
+                        ${isCompleted ? `<div class="text-[10px] bg-indigo-900/80 px-2 py-0.5 rounded text-blue-200 mt-1 border border-indigo-500"><i class="fa-solid fa-medal mr-1"></i>${darsana.badge}</div>` : ''}
+                    </div>
+                `;
+                container.innerHTML += nodeHTML;
+            });
+
+            // Check Final Quest Unlock
+            const btnFinal = document.getElementById('btn-final-quest');
+            const hintFinal = document.getElementById('final-quest-hint');
+            const lockIcon = document.getElementById('final-lock-icon');
+
+            if (gameState.completed.length >= 6) {
+                btnFinal.classList.remove('locked', 'opacity-50', 'cursor-not-allowed', 'game-btn');
+                btnFinal.classList.add('game-btn-secondary'); // Change color when unlocked
+                btnFinal.innerHTML = '<i class="fa-solid fa-khanda mr-2"></i> MULAI FINAL QUEST';
+                hintFinal.textContent = "Gerbang kebijaksanaan telah terbuka!";
+                hintFinal.classList.replace('text-slate-400', 'text-amber-400');
+            }
+        }
+
+        function openLesson(id) {
+            gameState.currentLessonId = id;
+            const data = darsanaData.find(d => d.id === id);
+            
+            document.getElementById('lesson-title').textContent = data.name;
+            document.getElementById('lesson-icon').className = `fa-solid ${data.icon} ${data.color}`;
+            document.getElementById('lesson-tokoh').textContent = data.tokoh;
+            document.getElementById('lesson-focus').textContent = data.focus;
+            document.getElementById('lesson-concept').textContent = data.concept;
+            document.getElementById('lesson-application').textContent = data.application;
+
+            changeScreen('screen-lesson');
+        }
+
+        function startMiniChallenge() {
+            const data = darsanaData.find(d => d.id === gameState.currentLessonId);
+            
+            document.getElementById('quiz-level-indicator').textContent = `Tantangan: ${data.name}`;
+            document.getElementById('quiz-question').textContent = data.quiz.question;
+            
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+            
+            data.quiz.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left bg-slate-800 hover:bg-slate-700 border border-slate-600 hover:border-amber-500 p-4 rounded-xl transition text-lg font-medium';
+                btn.textContent = opt;
+                btn.onclick = () => submitAnswer(index, data.quiz.correct);
+                optionsContainer.appendChild(btn);
+            });
+
+            changeScreen('screen-quiz');
+        }
+
+        function cancelQuiz() {
+            changeScreen('screen-map');
+        }
+
+        function submitAnswer(selectedIndex, correctIndex) {
+            if (selectedIndex === correctIndex) {
+                // Correct
+                const data = darsanaData.find(d => d.id === gameState.currentLessonId);
+                
+                // Only give XP if not already completed
+                let xpGained = 0;
+                if (!gameState.completed.includes(data.id)) {
+                    gameState.completed.push(data.id);
+                    gameState.xp += 100;
+                    xpGained = 100;
+                }
+                
+                showModal('Benar!', `Tepat sekali! Anda mendapatkan Badge "${data.badge}"${xpGained > 0 ? ' dan +100 XP' : ''}.`, 'success', () => {
+                    changeScreen('screen-map');
+                });
+            } else {
+                // Wrong
+                showModal('Kurang Tepat', 'Silakan pelajari materi kembali dan coba lagi.', 'error', () => {
+                    changeScreen('screen-lesson');
+                });
+            }
+        }
+
+        // --- FINAL QUEST LOGIC ---
+        function startFinalQuest() {
+            if (gameState.completed.length < 6) {
+                showModal('Terkunci', 'Kumpulkan keenam Badge Darsana terlebih dahulu untuk membuka Final Quest.', 'error');
+                return;
+            }
+            
+            gameState.fqCurrentIndex = 0;
+            gameState.fqLives = 3;
+            renderFinalQuestQuestion();
+            changeScreen('screen-final-quest');
+        }
+
+        function renderFinalQuestQuestion() {
+            const qData = finalQuestData[gameState.fqCurrentIndex];
+            
+            document.getElementById('fq-progress').textContent = `${gameState.fqCurrentIndex + 1}/${finalQuestData.length}`;
+            document.getElementById('fq-lives').textContent = gameState.fqLives;
+            document.getElementById('fq-question').textContent = qData.q;
+            
+            const optionsContainer = document.getElementById('fq-options');
+            optionsContainer.innerHTML = '';
+            
+            qData.opts.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left bg-slate-800 hover:bg-slate-700 border-2 border-slate-600 hover:border-blue-500 p-4 rounded-xl transition text-lg font-medium';
+                btn.innerHTML = `<span class="inline-block w-8 h-8 bg-slate-900 text-center rounded-full leading-8 mr-3 border border-slate-600 text-sm">${String.fromCharCode(65 + index)}</span> ${opt}`;
+                btn.onclick = () => submitFinalAnswer(index, qData.ans);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function submitFinalAnswer(selectedIndex, correctIndex) {
+            if (selectedIndex === correctIndex) {
+                // Next Question or Win
+                gameState.fqCurrentIndex++;
+                if (gameState.fqCurrentIndex >= finalQuestData.length) {
+                    winGame();
+                } else {
+                    // Show small correct feedback
+                    showModal('Tepat!', 'Lanjut ke soal berikutnya.', 'success', () => {
+                        renderFinalQuestQuestion();
+                    });
+                }
+            } else {
+                // Lose a life
+                gameState.fqLives--;
+                if (gameState.fqLives <= 0) {
+                    showModal('Gagal', 'Nyawa habis! Coba Final Quest dari awal.', 'error', () => {
+                        changeScreen('screen-map');
+                    });
+                } else {
+                    document.getElementById('fq-lives').textContent = gameState.fqLives;
+                    showModal('Salah', `Jawaban kurang tepat. Sisa nyawa: ${gameState.fqLives}`, 'error');
+                }
+            }
+        }
+
+        function winGame() {
+            gameState.xp += 500; // Bonus final
+            document.getElementById('final-score-display').textContent = gameState.xp;
+            changeScreen('screen-result');
+        }
+
+        function resetGame() {
+            gameState = {
+                xp: 0,
+                completed: [],
+                currentLessonId: null,
+                fqCurrentIndex: 0,
+                fqLives: 3
+            };
+            changeScreen('screen-home');
+        }
+
+        // --- UTILS: MODAL SYSTEM ---
+        function showModal(title, message, type = 'info', callback = null) {
+            const modal = document.getElementById('custom-modal');
+            const content = document.getElementById('modal-content');
+            const icon = document.getElementById('modal-icon');
+            const btn = document.getElementById('modal-btn');
+            
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-message').textContent = message;
+            
+            // Styling based on type
+            if(type === 'success') {
+                icon.innerHTML = '<i class="fa-solid fa-check-circle text-green-500"></i>';
+                document.getElementById('modal-title').className = "text-2xl font-bold mb-2 text-green-400";
+                btn.className = "game-btn text-white font-bold py-3 px-6 rounded-lg w-full bg-green-600";
+            } else if (type === 'error') {
+                icon.innerHTML = '<i class="fa-solid fa-circle-xmark text-red-500"></i>';
+                document.getElementById('modal-title').className = "text-2xl font-bold mb-2 text-red-400";
+                btn.className = "bg-red-600 hover:bg-red-500 text-white font-bold py-3 px-6 rounded-lg w-full transition";
+            } else {
+                icon.innerHTML = '<i class="fa-solid fa-circle-info text-blue-500"></i>';
+                document.getElementById('modal-title').className = "text-2xl font-bold mb-2 text-blue-400";
+                btn.className = "game-btn-secondary text-white font-bold py-3 px-6 rounded-lg w-full";
+            }
+
+            // Show animation
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 10);
+            
+            btn.onclick = () => {
+                // Hide animation
+                modal.classList.add('opacity-0');
+                content.classList.remove('scale-100');
+                content.classList.add('scale-95');
+                
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    if(callback) callback();
+                }, 300);
+            };
+        }
+
+        // Init Map UI on load (hidden initially)
+        updateMapUI();
+
     </script>
 </body>
 </html>
