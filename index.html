@@ -1,704 +1,2475 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jelajah Sad Darsana - Game Pembelajaran</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Poppins:wght@500;700;900&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
-            color: #f8fafc;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-        h1, h2, h3, h4, .font-poppins {
-            font-family: 'Poppins', sans-serif;
-        }
-        
-        /* Custom Game UI Styles */
-        .game-btn {
-            background: linear-gradient(to bottom, #f59e0b, #d97706);
-            border: 2px solid #fbbf24;
-            box-shadow: 0 4px 0 #b45309, 0 5px 15px rgba(0,0,0,0.4);
-            transition: all 0.1s;
-        }
-        .game-btn:active {
-            transform: translateY(4px);
-            box-shadow: 0 0 0 #b45309, 0 2px 5px rgba(0,0,0,0.4);
-        }
-        .game-btn-secondary {
-            background: linear-gradient(to bottom, #3b82f6, #2563eb);
-            border: 2px solid #60a5fa;
-            box-shadow: 0 4px 0 #1d4ed8, 0 5px 15px rgba(0,0,0,0.4);
-        }
-        .game-btn-secondary:active {
-            transform: translateY(4px);
-            box-shadow: 0 0 0 #1d4ed8, 0 2px 5px rgba(0,0,0,0.4);
-        }
-        
-        .panel {
-            background: rgba(30, 41, 59, 0.85);
-            backdrop-filter: blur(10px);
-            border: 2px solid #475569;
-            border-radius: 1rem;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MPI Sad Darsana</title>
 
-        .screen {
-            display: none;
-            animation: fadeIn 0.4s ease-out forwards;
-        }
-        .screen.active {
-            display: flex;
-            flex-direction: column;
-        }
+<style>
+:root {
+  --primary: #5b4bdb;
+  --secondary: #7c6ee6;
+  --light: #f4f2ff;
+  --dark: #25233a;
+  --text: #333344;
+  --white: #ffffff;
+  --green: #3aaa76;
+  --orange: #f29f4b;
+  --shadow: 0 8px 25px rgba(45,39,100,.12);
+  --radius: 18px;
+}
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-        /* Map Nodes */
-        .node {
-            position: relative;
-            transition: all 0.3s;
-        }
-        .node:hover {
-            transform: scale(1.05);
-        }
-        .node.locked {
-            filter: grayscale(100%) opacity(50%);
-            cursor: not-allowed;
-        }
-        .node.completed .badge {
-            display: flex;
-        }
-        
-        .floating {
-            animation: float 3s ease-in-out infinite;
-        }
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
+html {
+  scroll-behavior: smooth;
+}
 
-        /* Starry background effect */
-        .stars {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: -1;
-            background-image: 
-                radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)),
-                radial-gradient(2px 2px at 40px 70px, #ffffff, rgba(0,0,0,0)),
-                radial-gradient(2px 2px at 50px 160px, #ffffff, rgba(0,0,0,0)),
-                radial-gradient(2px 2px at 90px 40px, #ffffff, rgba(0,0,0,0)),
-                radial-gradient(2px 2px at 130px 80px, #ffffff, rgba(0,0,0,0)),
-                radial-gradient(2px 2px at 160px 120px, #ffffff, rgba(0,0,0,0));
-            background-repeat: repeat;
-            background-size: 200px 200px;
-            animation: twinkle 5s infinite;
-        }
-        @keyframes twinkle {
-            0% { opacity: 0.5; }
-            50% { opacity: 1; }
-            100% { opacity: 0.5; }
-        }
-    </style>
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f7f7fc;
+  color: var(--text);
+  line-height: 1.7;
+}
+
+/* ================= HEADER ================= */
+
+header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: white;
+  box-shadow: 0 3px 15px rgba(0,0,0,.08);
+}
+
+.navbar {
+  max-width: 1150px;
+  margin: auto;
+  padding: 14px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-weight: bold;
+  color: var(--primary);
+  font-size: 18px;
+}
+
+.menu-wrap {
+  position: relative;
+}
+
+.menu-btn {
+  border: none;
+  background: var(--primary);
+  color: white;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  font-size: 25px;
+  cursor: pointer;
+}
+
+.dropdown {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 50px;
+  width: 250px;
+  max-height: 75vh;
+  overflow-y: auto;
+  background: white;
+  border-radius: 15px;
+  padding: 10px;
+  box-shadow: var(--shadow);
+}
+
+.dropdown.show {
+  display: block;
+}
+
+.dropdown button {
+  width: 100%;
+  border: none;
+  background: white;
+  padding: 11px;
+  text-align: left;
+  border-radius: 10px;
+  cursor: pointer;
+  color: var(--text);
+  font-size: 14px;
+}
+
+.dropdown button:hover {
+  background: var(--light);
+  color: var(--primary);
+}
+
+.progress-container {
+  height: 4px;
+  background: #e9e7f5;
+}
+
+.progress-bar {
+  height: 4px;
+  width: 0%;
+  background: var(--primary);
+  transition: .3s;
+}
+
+/* ================= PAGE ================= */
+
+.page {
+  display: none;
+  max-width: 1150px;
+  margin: auto;
+  padding: 45px 20px 70px;
+}
+
+.page.active {
+  display: block;
+}
+
+.hero {
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.hero-box {
+  background: white;
+  padding: 50px 30px;
+  border-radius: 25px;
+  box-shadow: var(--shadow);
+  max-width: 850px;
+}
+
+.hero-icon {
+  font-size: 65px;
+  margin-bottom: 15px;
+}
+
+h1 {
+  color: var(--dark);
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+
+h2 {
+  color: var(--primary);
+  margin-bottom: 20px;
+}
+
+h3 {
+  color: var(--primary);
+  margin: 18px 0 8px;
+}
+
+p {
+  margin-bottom: 12px;
+}
+
+.subtitle {
+  color: #68677b;
+  font-size: 18px;
+}
+
+/* ================= BUTTON ================= */
+
+.btn {
+  border: none;
+  background: var(--primary);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: bold;
+  margin: 5px;
+  transition: .2s;
+}
+
+.btn:hover {
+  background: #4939c7;
+  transform: translateY(-1px);
+}
+
+.btn.secondary {
+  background: #e9e6ff;
+  color: var(--primary);
+}
+
+.btn.green {
+  background: var(--green);
+}
+
+/* ================= CARD ================= */
+
+.card {
+  background: white;
+  padding: 25px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+  gap: 18px;
+}
+
+.info-card {
+  background: white;
+  padding: 22px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.info-card .icon {
+  font-size: 35px;
+}
+
+/* ================= MEMBER ================= */
+
+.members {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(240px,1fr));
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.member {
+  background: var(--light);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+/* ================= DARSANA ================= */
+
+.darsana-buttons {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 15px;
+  margin: 25px 0;
+}
+
+.darsana-btn {
+  border: none;
+  padding: 22px 15px;
+  border-radius: 18px;
+  background: white;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: .2s;
+  font-weight: bold;
+  font-size: 16px;
+  color: var(--dark);
+}
+
+.darsana-btn:hover {
+  transform: translateY(-3px);
+}
+
+.darsana-btn.active {
+  background: var(--primary);
+  color: white;
+}
+
+.darsana-icon {
+  display: block;
+  font-size: 35px;
+  margin-bottom: 5px;
+}
+
+/* ================= MATERIAL ================= */
+
+.material-box {
+  background: white;
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  padding: 30px;
+  min-height: 400px;
+}
+
+.material-title {
+  font-size: 30px;
+  color: var(--primary);
+  margin-bottom: 5px;
+}
+
+.material-subtitle {
+  color: #777;
+  margin-bottom: 25px;
+}
+
+.material-section {
+  margin: 20px 0;
+}
+
+.material-section ul {
+  padding-left: 25px;
+}
+
+.highlight {
+  background: var(--light);
+  border-left: 5px solid var(--primary);
+  padding: 15px 18px;
+  border-radius: 10px;
+  margin: 15px 0;
+}
+
+.example {
+  background: #eefaf4;
+  border-left: 5px solid var(--green);
+  padding: 15px 18px;
+  border-radius: 10px;
+  margin: 15px 0;
+}
+
+.navigation {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 25px;
+  flex-wrap: wrap;
+}
+
+/* ================= PETA ================= */
+
+.peta-grid {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 18px;
+}
+
+.peta-card {
+  background: white;
+  padding: 25px;
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: .2s;
+}
+
+.peta-card:hover {
+  transform: translateY(-4px);
+}
+
+.peta-card h3 {
+  margin-top: 5px;
+}
+
+/* ================= QUIZ ================= */
+
+.question {
+  background: white;
+  padding: 22px;
+  border-radius: 16px;
+  margin-bottom: 18px;
+  box-shadow: var(--shadow);
+}
+
+.option {
+  display: block;
+  margin: 8px 0;
+  padding: 10px 12px;
+  background: #f7f7fb;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.option:hover {
+  background: var(--light);
+}
+
+.option input {
+  margin-right: 8px;
+}
+
+/* ================= SCORE ================= */
+
+.score-box {
+  text-align: center;
+  background: white;
+  padding: 45px 25px;
+  border-radius: 25px;
+  box-shadow: var(--shadow);
+}
+
+.score-number {
+  font-size: 65px;
+  font-weight: bold;
+  color: var(--primary);
+}
+
+/* ================= REFLECTION ================= */
+
+textarea {
+  width: 100%;
+  min-height: 180px;
+  border: 2px solid #ddd;
+  border-radius: 12px;
+  padding: 15px;
+  resize: vertical;
+  font-family: inherit;
+  font-size: 15px;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 700px) {
+
+  h1 {
+    font-size: 30px;
+  }
+
+  .page {
+    padding: 30px 15px 60px;
+  }
+
+  .darsana-buttons {
+    grid-template-columns: repeat(2,1fr);
+  }
+
+  .peta-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-box {
+    padding: 35px 20px;
+  }
+
+  .material-box {
+    padding: 20px;
+  }
+
+  .darsana-btn {
+    padding: 18px 10px;
+    font-size: 14px;
+  }
+}
+</style>
 </head>
-<body class="antialiased text-slate-100 selection:bg-amber-500 selection:text-white">
-    <div class="stars"></div>
 
-    <div class="max-w-4xl mx-auto p-4 min-h-screen flex flex-col justify-center relative" id="app-container">
-        
-        <!-- ================= HOME SCREEN ================= -->
-        <div id="screen-home" class="screen active items-center text-center">
-            <div class="floating mb-6">
-                <i class="fa-solid fa-om text-7xl text-amber-400 drop-shadow-[0_0_15px_rgba(251,191,36,0.8)]"></i>
-            </div>
-            <h1 class="text-4xl md:text-6xl font-black mb-4 text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-yellow-600 drop-shadow-lg">
-                JELAJAH SAD DARSANA
-            </h1>
-            <p class="text-lg md:text-xl text-slate-300 mb-10 max-w-2xl">
-                Temukan hakikat kehidupan, pengetahuan, dan kebenaran melalui 6 sistem filsafat Hindu. Jadilah sang bijaksana!
-            </p>
-            
-            <div class="flex flex-col gap-4 w-full max-w-xs">
-                <button onclick="changeScreen('screen-map')" class="game-btn text-white font-bold py-4 px-6 rounded-xl text-xl uppercase tracking-wider">
-                    <i class="fa-solid fa-play mr-2"></i> Mulai Petualangan
-                </button>
-                <button onclick="changeScreen('screen-tutorial')" class="game-btn-secondary text-white font-bold py-3 px-6 rounded-xl text-lg">
-                    <i class="fa-solid fa-book-open mr-2"></i> Petunjuk & Tujuan
-                </button>
-            </div>
-        </div>
+<body>
 
-        <!-- ================= TUTORIAL / TUJUAN SCREEN ================= -->
-        <div id="screen-tutorial" class="screen panel p-6 md:p-10 w-full max-w-3xl mx-auto">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-3xl font-bold text-amber-400"><i class="fa-solid fa-scroll mr-3"></i>Petunjuk & Tujuan</h2>
-                <button onclick="changeScreen('screen-home')" class="text-slate-400 hover:text-white text-2xl transition"><i class="fa-solid fa-times"></i></button>
-            </div>
-            
-            <div class="space-y-6 overflow-y-auto max-h-[60vh] pr-2 custom-scrollbar">
-                <div>
-                    <h3 class="text-xl font-bold text-blue-300 mb-2 border-b border-slate-600 pb-1">Tujuan Pembelajaran</h3>
-                    <ul class="list-disc pl-5 space-y-1 text-slate-300">
-                        <li>Menjelaskan pengertian Darsana sebagai sistem filsafat Hindu.</li>
-                        <li>Mengidentifikasi enam sistem filsafat Hindu atau Sad Darsana.</li>
-                        <li>Menghubungkan pemikiran Darsana dengan kehidupan sehari-hari.</li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="text-xl font-bold text-green-300 mb-2 border-b border-slate-600 pb-1">Petunjuk Permainan</h3>
-                    <ol class="list-decimal pl-5 space-y-2 text-slate-300">
-                        <li>Awali dengan doa dan niat yang baik.</li>
-                        <li>Pilih level (Darsana) di Peta Penjelajahan. Terdapat 6 level utama.</li>
-                        <li>Pelajari materi pada setiap level: Tokoh, Fokus Pemikiran, dan Penerapan.</li>
-                        <li>Selesaikan <b>Mini Challenge</b> di setiap level untuk mendapatkan XP dan <i>Badge Achievement</i>.</li>
-                        <li>Setelah mengumpulkan 6 Badge, <b>Final Quest</b> akan terbuka!</li>
-                        <li>Raih gelar "Mahaguru Filsafat" dengan menyelesaikan Final Quest.</li>
-                    </ol>
-                </div>
-                <div class="bg-slate-800 p-4 rounded-lg border border-slate-600">
-                    <p class="text-sm italic text-amber-200">"Belajar Darsana bukan hanya memahami pemikiran para filsuf Hindu, tetapi belajar melihat kehidupan dengan lebih sadar, berpikir kritis, dan bertindak bijaksana."</p>
-                </div>
-            </div>
-            
-            <div class="mt-8 text-center">
-                <button onclick="changeScreen('screen-map')" class="game-btn text-white font-bold py-3 px-8 rounded-xl text-lg">
-                    Mengerti, Lanjutkan! <i class="fa-solid fa-arrow-right ml-2"></i>
-                </button>
-            </div>
-        </div>
+<!-- ================= HEADER ================= -->
 
-        <!-- ================= MAP SCREEN ================= -->
-        <div id="screen-map" class="screen w-full">
-            <div class="flex justify-between items-center mb-8 bg-slate-800/80 p-4 rounded-xl border border-slate-600 shadow-lg">
-                <div class="flex items-center gap-4">
-                    <button onclick="changeScreen('screen-home')" class="bg-slate-700 hover:bg-slate-600 p-3 rounded-lg transition"><i class="fa-solid fa-house"></i></button>
-                    <div>
-                        <div class="text-sm text-slate-400 font-bold uppercase">Player Stats</div>
-                        <div class="text-amber-400 font-black text-xl"><i class="fa-solid fa-star mr-1"></i> <span id="player-xp">0</span> XP</div>
-                    </div>
-                </div>
-                <div class="text-right">
-                    <div class="text-sm text-slate-400 font-bold uppercase">Badges</div>
-                    <div class="text-blue-300 font-black text-xl" id="badge-count">0/6</div>
-                </div>
-            </div>
+<header>
 
-            <h2 class="text-3xl font-black text-center mb-8 text-white drop-shadow-md">PETA SAD DARSANA</h2>
+  <div class="navbar">
 
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-10 max-w-3xl mx-auto" id="map-nodes-container">
-                <!-- Nodes generated by JS -->
-            </div>
+    <div class="logo">
+      📚 MPI • SAD DARSANA
+    </div>
 
-            <div class="mt-12 text-center">
-                <button id="btn-final-quest" onclick="startFinalQuest()" class="game-btn text-white font-bold py-4 px-10 rounded-xl text-xl locked opacity-50 cursor-not-allowed transition-all">
-                    <i class="fa-solid fa-khanda mr-2"></i> FINAL QUEST <i class="fa-solid fa-lock ml-2" id="final-lock-icon"></i>
-                </button>
-                <p class="text-sm text-slate-400 mt-2" id="final-quest-hint">Kumpulkan 6 Badge untuk membuka rintangan terakhir.</p>
-            </div>
-        </div>
+    <div class="menu-wrap">
 
-        <!-- ================= LESSON SCREEN ================= -->
-        <div id="screen-lesson" class="screen panel p-6 md:p-8 max-w-3xl w-full mx-auto">
-            <div class="flex justify-between items-start mb-6">
-                <div>
-                    <span class="bg-amber-500/20 text-amber-300 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide border border-amber-500/50" id="lesson-subtitle">Sistem Filsafat</span>
-                    <h2 class="text-4xl font-black text-white mt-2 flex items-center gap-3">
-                        <i id="lesson-icon" class="fa-solid fa-book text-amber-400"></i>
-                        <span id="lesson-title">Nama Darsana</span>
-                    </h2>
-                </div>
-                <button onclick="changeScreen('screen-map')" class="text-slate-400 hover:text-white text-2xl transition"><i class="fa-solid fa-times"></i></button>
-            </div>
+      <button class="menu-btn" onclick="toggleMenu()">⋮</button>
 
-            <div class="grid md:grid-cols-2 gap-6 mb-8">
-                <div class="bg-slate-800/80 p-5 rounded-xl border border-slate-600">
-                    <h3 class="text-sm text-slate-400 font-bold uppercase mb-1">Tokoh Utama</h3>
-                    <p class="text-xl font-bold text-blue-300" id="lesson-tokoh">Rsi Name</p>
-                </div>
-                <div class="bg-slate-800/80 p-5 rounded-xl border border-slate-600">
-                    <h3 class="text-sm text-slate-400 font-bold uppercase mb-1">Fokus Pemikiran</h3>
-                    <p class="text-lg font-semibold text-white" id="lesson-focus">Focus Area</p>
-                </div>
-            </div>
+      <div class="dropdown" id="dropdownMenu">
 
-            <div class="bg-slate-700/50 p-6 rounded-xl border border-slate-600 mb-6">
-                <h3 class="text-lg font-bold text-amber-400 mb-3 flex items-center"><i class="fa-solid fa-lightbulb mr-2"></i> Konsep Utama</h3>
-                <p class="text-slate-200 leading-relaxed text-lg" id="lesson-concept">Concept explanation goes here.</p>
-            </div>
+        <button onclick="go('home')">🏠 Beranda</button>
+        <button onclick="go('petunjuk')">📖 Petunjuk</button>
+        <button onclick="go('tujuan')">🎯 Tujuan Pembelajaran</button>
+        <button onclick="go('peta')">🗺️ Peta Sad Darsana</button>
+        <button onclick="go('materi')">📚 Materi Sad Darsana</button>
+        <button onclick="go('astika')">☯️ Astika & Nastika</button>
+        <button onclick="go('penerapan')">🌱 Penerapan Darsana</button>
+        <button onclick="go('quiz')">⚔️ Final Quest</button>
+        <button onclick="go('score')">🏆 Hasil / Skor</button>
+        <button onclick="go('refleksi')">💭 Refleksi</button>
 
-            <div class="bg-indigo-900/40 p-6 rounded-xl border border-indigo-500/50 mb-8">
-                <h3 class="text-lg font-bold text-indigo-300 mb-3 flex items-center"><i class="fa-solid fa-people-arrows mr-2"></i> Penerapan Sehari-hari</h3>
-                <p class="text-slate-300 leading-relaxed italic" id="lesson-application">Application goes here.</p>
-            </div>
-
-            <div class="text-center">
-                <button onclick="startMiniChallenge()" class="game-btn text-white font-bold py-4 px-10 rounded-xl text-lg w-full md:w-auto shadow-[0_0_15px_rgba(251,191,36,0.4)]">
-                    <i class="fa-solid fa-swords mr-2"></i> Mulai Mini Challenge
-                </button>
-            </div>
-        </div>
-
-        <!-- ================= QUIZ / CHALLENGE SCREEN ================= -->
-        <div id="screen-quiz" class="screen panel p-6 md:p-10 max-w-2xl w-full mx-auto text-center">
-            <div class="mb-6 flex justify-between items-center text-sm font-bold text-slate-400 uppercase">
-                <span id="quiz-level-indicator">Level: Nyaya</span>
-                <span><i class="fa-solid fa-star text-amber-400"></i> Reward: 100 XP</span>
-            </div>
-            
-            <div class="mb-8">
-                <h2 class="text-2xl md:text-3xl font-bold text-white mb-6 leading-tight" id="quiz-question">Pertanyaan kuis akan muncul di sini?</h2>
-            </div>
-
-            <div class="grid gap-4" id="quiz-options">
-                <!-- Options generated by JS -->
-            </div>
-            
-            <button onclick="cancelQuiz()" class="mt-8 text-slate-400 hover:text-white underline text-sm">Kembali ke Peta</button>
-        </div>
-
-        <!-- ================= FINAL QUEST SCREEN ================= -->
-        <div id="screen-final-quest" class="screen panel p-6 md:p-10 max-w-2xl w-full mx-auto text-center border-amber-500 shadow-[0_0_30px_rgba(245,158,11,0.3)]">
-            <div class="mb-4 text-amber-400 font-bold uppercase tracking-widest flex justify-center items-center gap-2">
-                <i class="fa-solid fa-skull"></i> FINAL QUEST <i class="fa-solid fa-skull"></i>
-            </div>
-            
-            <div class="flex justify-between items-center mb-6">
-                <div class="text-sm font-bold text-slate-300 bg-slate-800 px-3 py-1 rounded-lg">Soal: <span id="fq-progress">1/5</span></div>
-                <div class="text-sm font-bold text-amber-400 bg-slate-800 px-3 py-1 rounded-lg"><i class="fa-solid fa-heart text-red-500"></i> Nyawa: <span id="fq-lives">3</span></div>
-            </div>
-
-            <div class="mb-8 min-h-[100px] flex items-center justify-center">
-                <h2 class="text-2xl md:text-3xl font-bold text-white leading-tight" id="fq-question">Pertanyaan final quest?</h2>
-            </div>
-
-            <div class="grid gap-4" id="fq-options">
-                <!-- Options generated by JS -->
-            </div>
-        </div>
-
-        <!-- ================= RESULT / REFLECTION SCREEN ================= -->
-        <div id="screen-result" class="screen panel p-6 md:p-10 max-w-3xl w-full mx-auto text-center">
-            <div class="floating mb-4">
-                <i class="fa-solid fa-trophy text-8xl text-amber-400 drop-shadow-[0_0_20px_rgba(251,191,36,0.8)]"></i>
-            </div>
-            <h2 class="text-4xl font-black mb-2 text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-yellow-600">SELAMAT!</h2>
-            <h3 class="text-2xl font-bold text-white mb-6">Anda Meraih Gelar: <span class="text-blue-400">Mahaguru Filsafat</span></h3>
-            
-            <div class="bg-slate-800/80 p-6 rounded-xl border border-slate-600 mb-8 inline-block min-w-[250px]">
-                <div class="text-sm text-slate-400 font-bold uppercase mb-1">Total Skor Akhir</div>
-                <div class="text-5xl font-black text-amber-400"><i class="fa-solid fa-star"></i> <span id="final-score-display">1100</span></div>
-            </div>
-
-            <div class="bg-indigo-900/50 p-6 rounded-xl border border-indigo-500/50 mb-8 text-left">
-                <h3 class="text-xl font-bold text-indigo-300 mb-4 border-b border-indigo-500/50 pb-2"><i class="fa-solid fa-om mr-2"></i> Refleksi Pembelajaran Mendalam</h3>
-                <p class="text-slate-300 mb-4 italic">"Darsana mengajarkan kita untuk melihat kebenaran dengan mata kebijaksanaan. Pengetahuan apa yang paling bermakna bagi Anda hari ini?"</p>
-                <textarea class="w-full bg-slate-800 border border-slate-600 rounded-lg p-3 text-white focus:outline-none focus:border-amber-500 transition" rows="3" placeholder="Tuliskan refleksi singkat Anda di sini (opsional)..."></textarea>
-            </div>
-
-            <button onclick="resetGame()" class="game-btn text-white font-bold py-3 px-8 rounded-xl text-lg">
-                <i class="fa-solid fa-rotate-right mr-2"></i> Mainkan Ulang
-            </button>
-        </div>
+      </div>
 
     </div>
 
-    <!-- ================= CUSTOM MODAL ================= -->
-    <div id="custom-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 hidden opacity-0 transition-opacity duration-300 backdrop-blur-sm">
-        <div class="panel p-8 max-w-sm w-full mx-4 text-center transform scale-95 transition-transform duration-300" id="modal-content">
-            <div id="modal-icon" class="text-6xl mb-4"></div>
-            <h3 id="modal-title" class="text-2xl font-bold mb-2">Title</h3>
-            <p id="modal-message" class="text-slate-300 mb-6">Message goes here.</p>
-            <button id="modal-btn" class="game-btn text-white font-bold py-2 px-6 rounded-lg w-full">Lanjut</button>
-        </div>
+  </div>
+
+  <div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+</header>
+
+
+<!-- ================= BERANDA ================= -->
+
+<section class="page active" id="home">
+
+  <div class="hero">
+
+    <div class="hero-box">
+
+      <div class="hero-icon">🕉️</div>
+
+      <h1>
+        MEDIA PEMBELAJARAN INTERAKTIF
+      </h1>
+
+      <h2>
+        SAD DARSANA
+      </h2>
+
+      <p class="subtitle">
+        Mengenal enam sistem filsafat India dalam tradisi Hindu
+        melalui media pembelajaran digital yang interaktif.
+      </p>
+
+      <br>
+
+      <button class="btn" onclick="go('petunjuk')">
+        Mulai Belajar →
+      </button>
+
     </div>
 
-    <script>
-        // --- DATA DEFINITION ---
-        const darsanaData = [
-            {
-                id: 'nyaya',
-                name: 'Nyaya',
-                icon: 'fa-brain',
-                color: 'text-blue-400',
-                bgClass: 'bg-blue-900/50 hover:bg-blue-800/80 border-blue-500',
-                tokoh: 'Rsi Gautama (Aksapada Gautama)',
-                focus: 'Logika, Penalaran & Pengetahuan Benar',
-                concept: 'Nyaya adalah sistem filsafat yang menitikberatkan pada logika dan analisis. Mengajarkan cara berpikir logis, membedakan pengetahuan yang benar dan keliru, serta menarik kesimpulan berdasarkan alasan yang tepat (Pramana).',
-                application: 'Sebelum mempercayai informasi (hoaks) di media sosial, kita harus memeriksa sumber, bukti, dan alasan logis yang mendukung informasi tersebut.',
-                badge: 'Sang Pemikir',
-                quiz: {
-                    question: 'Jika kamu menganalisis sebuah informasi untuk membedakan mana yang benar dan keliru menggunakan logika, pemikiran Darsana apa yang sedang kamu terapkan?',
-                    options: ['Yoga', 'Nyaya', 'Mimamsa', 'Vedanta'],
-                    correct: 1 // index of correct answer
-                }
-            },
-            {
-                id: 'vaiseshika',
-                name: 'Vaiseshika',
-                icon: 'fa-cubes',
-                color: 'text-emerald-400',
-                bgClass: 'bg-emerald-900/50 hover:bg-emerald-800/80 border-emerald-500',
-                tokoh: 'Rsi Kanada',
-                focus: 'Hakikat Realitas & Kategori',
-                concept: 'Memberikan perhatian terhadap hakikat realitas (alam semesta) dan mengelompokkan berbagai kategori materi yang ada di dalamnya secara sistematis. Teori atom (Paramanu) berasal dari ajaran ini.',
-                application: 'Kemampuan mengelompokkan, mengidentifikasi objek, dan berpikir sistematis saat melakukan penelitian atau mengorganisir tugas sekolah.',
-                badge: 'Sang Pengamat',
-                quiz: {
-                    question: 'Tokoh yang dikenal menyusun sistem filsafat Vaiseshika dan mengajarkan pengkategorian realitas adalah...',
-                    options: ['Rsi Patanjali', 'Rsi Jaimini', 'Rsi Kanada', 'Rsi Kapila'],
-                    correct: 2
-                }
-            },
-            {
-                id: 'samkhya',
-                name: 'Samkhya',
-                icon: 'fa-yin-yang',
-                color: 'text-purple-400',
-                bgClass: 'bg-purple-900/50 hover:bg-purple-800/80 border-purple-500',
-                tokoh: 'Rsi Kapila',
-                focus: 'Dualisme: Purusa & Prakrti',
-                concept: 'Menjelaskan realitas alam semesta terbentuk dari pertemuan dua prinsip abadi: Purusa (asas kesadaran/roh) dan Prakrti (asas materi/alam). Samkhya adalah filsafat tertua.',
-                application: 'Menyadari bahwa kehidupan tidak hanya berpusat pada kepuasan materi (Prakrti), tetapi juga membutuhkan kedamaian batin dan kesadaran spiritual (Purusa).',
-                badge: 'Sang Penyelaras',
-                quiz: {
-                    question: 'Dua prinsip utama yang menjadi dasar pembentukan alam semesta menurut filsafat Samkhya adalah...',
-                    options: ['Dharma dan Adharma', 'Purusa dan Prakrti', 'Atman dan Brahman', 'Sruti dan Smerti'],
-                    correct: 1
-                }
-            },
-            {
-                id: 'yoga',
-                name: 'Yoga',
-                icon: 'fa-spa',
-                color: 'text-teal-400',
-                bgClass: 'bg-teal-900/50 hover:bg-teal-800/80 border-teal-500',
-                tokoh: 'Rsi Patanjali',
-                focus: 'Disiplin & Pengendalian Diri',
-                concept: 'Sistem filsafat yang sangat erat praktiknya dengan ajaran disiplin, pengendalian pikiran, konsentrasi, dan meditasi untuk mencapai keadaan spiritual yang lebih tinggi (Moksa).',
-                application: 'Mengendalikan emosi saat marah (misal saat dikritik), mengatur pikiran agar fokus saat belajar, dan membangun kebiasaan hidup yang disiplin.',
-                badge: 'Sang Petapa',
-                quiz: {
-                    question: 'Sistem filsafat yang sangat erat dengan praktik pengendalian pikiran, konsentrasi, meditasi, dan disiplin diri adalah...',
-                    options: ['Nyaya', 'Vaiseshika', 'Mimamsa', 'Yoga'],
-                    correct: 3
-                }
-            },
-            {
-                id: 'mimamsa',
-                name: 'Mimamsa',
-                icon: 'fa-fire-flame-curved',
-                color: 'text-orange-400',
-                bgClass: 'bg-orange-900/50 hover:bg-orange-800/80 border-orange-500',
-                tokoh: 'Rsi Jaimini',
-                focus: 'Weda, Kewajiban & Ritual',
-                concept: 'Memberikan perhatian penuh pada bagian Karma Kanda dari Weda. Menekankan pentingnya pelaksanaan kewajiban (Dharma) dan tindakan keagamaan (Yadnya) secara benar.',
-                application: 'Menerapkan nilai tanggung jawab dengan melaksanakan kewajiban sebagai siswa, menghormati orang tua/guru, dan sembahyang dengan sungguh-sungguh.',
-                badge: 'Sang Pelaksana',
-                quiz: {
-                    question: 'Fokus utama dari ajaran Mimamsa yang diajarkan oleh Rsi Jaimini adalah...',
-                    options: ['Meditasi dan pengendalian napas', 'Logika dan debat', 'Pelaksanaan kewajiban (Dharma) berdasarkan Weda', 'Pembebasan melalui pengetahuan (Jnana)'],
-                    correct: 2
-                }
-            },
-            {
-                id: 'vedanta',
-                name: 'Vedanta',
-                icon: 'fa-infinity',
-                color: 'text-rose-400',
-                bgClass: 'bg-rose-900/50 hover:bg-rose-800/80 border-rose-500',
-                tokoh: 'Badarayana (Rsi Vyasa)',
-                focus: 'Realitas Tertinggi (Upanisad)',
-                concept: 'Vedanta berarti "akhir dari Weda" (berhubungan dengan Upanisad). Membahas persoalan filosofis tertinggi mengenai Atman (jiwa individu), Brahman (Tuhan/realitas tertinggi), dan pembebasan.',
-                application: 'Melakukan refleksi diri secara mendalam mengenai hakikat diri "Siapakah saya?", hubungan dengan Tuhan, serta tujuan tertinggi kehidupan manusia.',
-                badge: 'Sang Bijaksana',
-                quiz: {
-                    question: 'Vedanta merupakan sistem filsafat yang memiliki hubungan erat dengan bagian akhir Weda, khususnya...',
-                    options: ['Reg Veda', 'Ayurveda', 'Upanisad', 'Purana'],
-                    correct: 2
-                }
-            }
-        ];
+  </div>
 
-        const finalQuestData = [
-            {
-                q: "Istilah yang digunakan untuk menyebut 6 sistem filsafat dalam tradisi Hindu adalah...",
-                opts: ["Catur Marga", "Sad Darsana", "Panca Sradha", "Tri Hita Karana"],
-                ans: 1
-            },
-            {
-                q: "Pasangan tokoh dan aliran Darsana yang BENAR di bawah ini adalah...",
-                opts: ["Rsi Kanada - Yoga", "Rsi Gautama - Samkhya", "Rsi Patanjali - Yoga", "Rsi Jaimini - Vaiseshika"],
-                ans: 2
-            },
-            {
-                q: "Jika seorang siswa memutuskan untuk belajar daripada bermain game karena sadar akan kewajibannya, nilai Darsana manakah yang paling mencerminkan penekanan pada pelaksanaan kewajiban?",
-                opts: ["Mimamsa", "Nyaya", "Vedanta", "Vaiseshika"],
-                ans: 0
-            },
-            {
-                q: "Dalam Samkhya, prinsip kesadaran rohani disebut..., sedangkan prinsip materi/alam disebut...",
-                opts: ["Atman - Brahman", "Purusa - Prakrti", "Dharma - Karma", "Yoga - Bhakti"],
-                ans: 1
-            },
-            {
-                q: "Makna utama mempelajari Darsana bagi kehidupan remaja masa kini adalah...",
-                opts: ["Menjadi pandai berdebat untuk mengalahkan orang lain", "Meninggalkan dunia dan hidup di hutan", "Menghafal seluruh kitab suci tanpa henti", "Mengembangkan pikiran kritis, sadar, dan bertindak bijaksana"],
-                ans: 3
-            }
-        ];
 
-        // --- STATE MANAGEMENT ---
-        let gameState = {
-            xp: 0,
-            completed: [],
-            currentLessonId: null,
-            fqCurrentIndex: 0,
-            fqLives: 3
-        };
+  <div class="card">
 
-        // --- UI FUNCTIONS ---
-        function changeScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-            
-            if(screenId === 'screen-map') {
-                updateMapUI();
-            }
-        }
+    <h2>👥 Identitas Kelompok</h2>
 
-        function updateMapUI() {
-            document.getElementById('player-xp').textContent = gameState.xp;
-            document.getElementById('badge-count').textContent = `${gameState.completed.length}/6`;
+    <p>
+      Media Pembelajaran Interaktif ini dibuat sebagai bagian dari
+      kegiatan pembelajaran mengenai Sad Darsana.
+    </p>
 
-            const container = document.getElementById('map-nodes-container');
-            container.innerHTML = '';
+    <div class="members">
 
-            darsanaData.forEach(darsana => {
-                const isCompleted = gameState.completed.includes(darsana.id);
-                
-                const nodeHTML = `
-                    <div class="node flex flex-col items-center cursor-pointer ${isCompleted ? 'completed' : ''}" onclick="openLesson('${darsana.id}')">
-                        <div class="w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center text-3xl md:text-4xl shadow-lg border-4 ${darsana.bgClass} relative">
-                            <i class="fa-solid ${darsana.icon} ${darsana.color}"></i>
-                            ${isCompleted ? `<div class="badge absolute -bottom-2 -right-2 bg-amber-500 text-white text-xs font-bold px-2 py-1 rounded shadow border border-yellow-300 hidden"><i class="fa-solid fa-check mr-1"></i>Clear</div>` : ''}
-                        </div>
-                        <div class="mt-3 font-bold text-center ${isCompleted ? 'text-amber-400' : 'text-slate-300'}">${darsana.name}</div>
-                        ${isCompleted ? `<div class="text-[10px] bg-indigo-900/80 px-2 py-0.5 rounded text-blue-200 mt-1 border border-indigo-500"><i class="fa-solid fa-medal mr-1"></i>${darsana.badge}</div>` : ''}
-                    </div>
-                `;
-                container.innerHTML += nodeHTML;
-            });
+      <div class="member">
+        Gede Andhika Prawira Putra — <b>7</b>
+      </div>
 
-            // Check Final Quest Unlock
-            const btnFinal = document.getElementById('btn-final-quest');
-            const hintFinal = document.getElementById('final-quest-hint');
-            const lockIcon = document.getElementById('final-lock-icon');
+      <div class="member">
+        I Gusti Ngurah Putu Susila Kurniawan — <b>13</b>
+      </div>
 
-            if (gameState.completed.length >= 6) {
-                btnFinal.classList.remove('locked', 'opacity-50', 'cursor-not-allowed', 'game-btn');
-                btnFinal.classList.add('game-btn-secondary'); // Change color when unlocked
-                btnFinal.innerHTML = '<i class="fa-solid fa-khanda mr-2"></i> MULAI FINAL QUEST';
-                hintFinal.textContent = "Gerbang kebijaksanaan telah terbuka!";
-                hintFinal.classList.replace('text-slate-400', 'text-amber-400');
-            }
-        }
+      <div class="member">
+        I Kadek Dika Darmawan — <b>16</b>
+      </div>
 
-        function openLesson(id) {
-            gameState.currentLessonId = id;
-            const data = darsanaData.find(d => d.id === id);
-            
-            document.getElementById('lesson-title').textContent = data.name;
-            document.getElementById('lesson-icon').className = `fa-solid ${data.icon} ${data.color}`;
-            document.getElementById('lesson-tokoh').textContent = data.tokoh;
-            document.getElementById('lesson-focus').textContent = data.focus;
-            document.getElementById('lesson-concept').textContent = data.concept;
-            document.getElementById('lesson-application').textContent = data.application;
+      <div class="member">
+        I Made Adrian Byantara Ardana — <b>19</b>
+      </div>
 
-            changeScreen('screen-lesson');
-        }
+      <div class="member">
+        I Made Bagus Alden Putra Wahyu — <b>21</b>
+      </div>
 
-        function startMiniChallenge() {
-            const data = darsanaData.find(d => d.id === gameState.currentLessonId);
-            
-            document.getElementById('quiz-level-indicator').textContent = `Tantangan: ${data.name}`;
-            document.getElementById('quiz-question').textContent = data.quiz.question;
-            
-            const optionsContainer = document.getElementById('quiz-options');
-            optionsContainer.innerHTML = '';
-            
-            data.quiz.options.forEach((opt, index) => {
-                const btn = document.createElement('button');
-                btn.className = 'w-full text-left bg-slate-800 hover:bg-slate-700 border border-slate-600 hover:border-amber-500 p-4 rounded-xl transition text-lg font-medium';
-                btn.textContent = opt;
-                btn.onclick = () => submitAnswer(index, data.quiz.correct);
-                optionsContainer.appendChild(btn);
-            });
+      <div class="member">
+        Komang Teja Mertha Bhawa — <b>36</b>
+      </div>
 
-            changeScreen('screen-quiz');
-        }
+    </div>
 
-        function cancelQuiz() {
-            changeScreen('screen-map');
-        }
+  </div>
 
-        function submitAnswer(selectedIndex, correctIndex) {
-            if (selectedIndex === correctIndex) {
-                // Correct
-                const data = darsanaData.find(d => d.id === gameState.currentLessonId);
-                
-                // Only give XP if not already completed
-                let xpGained = 0;
-                if (!gameState.completed.includes(data.id)) {
-                    gameState.completed.push(data.id);
-                    gameState.xp += 100;
-                    xpGained = 100;
-                }
-                
-                showModal('Benar!', `Tepat sekali! Anda mendapatkan Badge "${data.badge}"${xpGained > 0 ? ' dan +100 XP' : ''}.`, 'success', () => {
-                    changeScreen('screen-map');
-                });
-            } else {
-                // Wrong
-                showModal('Kurang Tepat', 'Silakan pelajari materi kembali dan coba lagi.', 'error', () => {
-                    changeScreen('screen-lesson');
-                });
-            }
-        }
+</section>
 
-        // --- FINAL QUEST LOGIC ---
-        function startFinalQuest() {
-            if (gameState.completed.length < 6) {
-                showModal('Terkunci', 'Kumpulkan keenam Badge Darsana terlebih dahulu untuk membuka Final Quest.', 'error');
-                return;
-            }
-            
-            gameState.fqCurrentIndex = 0;
-            gameState.fqLives = 3;
-            renderFinalQuestQuestion();
-            changeScreen('screen-final-quest');
-        }
 
-        function renderFinalQuestQuestion() {
-            const qData = finalQuestData[gameState.fqCurrentIndex];
-            
-            document.getElementById('fq-progress').textContent = `${gameState.fqCurrentIndex + 1}/${finalQuestData.length}`;
-            document.getElementById('fq-lives').textContent = gameState.fqLives;
-            document.getElementById('fq-question').textContent = qData.q;
-            
-            const optionsContainer = document.getElementById('fq-options');
-            optionsContainer.innerHTML = '';
-            
-            qData.opts.forEach((opt, index) => {
-                const btn = document.createElement('button');
-                btn.className = 'w-full text-left bg-slate-800 hover:bg-slate-700 border-2 border-slate-600 hover:border-blue-500 p-4 rounded-xl transition text-lg font-medium';
-                btn.innerHTML = `<span class="inline-block w-8 h-8 bg-slate-900 text-center rounded-full leading-8 mr-3 border border-slate-600 text-sm">${String.fromCharCode(65 + index)}</span> ${opt}`;
-                btn.onclick = () => submitFinalAnswer(index, qData.ans);
-                optionsContainer.appendChild(btn);
-            });
-        }
+<!-- ================= PETUNJUK ================= -->
 
-        function submitFinalAnswer(selectedIndex, correctIndex) {
-            if (selectedIndex === correctIndex) {
-                // Next Question or Win
-                gameState.fqCurrentIndex++;
-                if (gameState.fqCurrentIndex >= finalQuestData.length) {
-                    winGame();
-                } else {
-                    // Show small correct feedback
-                    showModal('Tepat!', 'Lanjut ke soal berikutnya.', 'success', () => {
-                        renderFinalQuestQuestion();
-                    });
-                }
-            } else {
-                // Lose a life
-                gameState.fqLives--;
-                if (gameState.fqLives <= 0) {
-                    showModal('Gagal', 'Nyawa habis! Coba Final Quest dari awal.', 'error', () => {
-                        changeScreen('screen-map');
-                    });
-                } else {
-                    document.getElementById('fq-lives').textContent = gameState.fqLives;
-                    showModal('Salah', `Jawaban kurang tepat. Sisa nyawa: ${gameState.fqLives}`, 'error');
-                }
-            }
-        }
+<section class="page" id="petunjuk">
 
-        function winGame() {
-            gameState.xp += 500; // Bonus final
-            document.getElementById('final-score-display').textContent = gameState.xp;
-            changeScreen('screen-result');
-        }
+  <h2>📖 Petunjuk Penggunaan</h2>
 
-        function resetGame() {
-            gameState = {
-                xp: 0,
-                completed: [],
-                currentLessonId: null,
-                fqCurrentIndex: 0,
-                fqLives: 3
-            };
-            changeScreen('screen-home');
-        }
+  <div class="card">
 
-        // --- UTILS: MODAL SYSTEM ---
-        function showModal(title, message, type = 'info', callback = null) {
-            const modal = document.getElementById('custom-modal');
-            const content = document.getElementById('modal-content');
-            const icon = document.getElementById('modal-icon');
-            const btn = document.getElementById('modal-btn');
-            
-            document.getElementById('modal-title').textContent = title;
-            document.getElementById('modal-message').textContent = message;
-            
-            // Styling based on type
-            if(type === 'success') {
-                icon.innerHTML = '<i class="fa-solid fa-check-circle text-green-500"></i>';
-                document.getElementById('modal-title').className = "text-2xl font-bold mb-2 text-green-400";
-                btn.className = "game-btn text-white font-bold py-3 px-6 rounded-lg w-full bg-green-600";
-            } else if (type === 'error') {
-                icon.innerHTML = '<i class="fa-solid fa-circle-xmark text-red-500"></i>';
-                document.getElementById('modal-title').className = "text-2xl font-bold mb-2 text-red-400";
-                btn.className = "bg-red-600 hover:bg-red-500 text-white font-bold py-3 px-6 rounded-lg w-full transition";
-            } else {
-                icon.innerHTML = '<i class="fa-solid fa-circle-info text-blue-500"></i>';
-                document.getElementById('modal-title').className = "text-2xl font-bold mb-2 text-blue-400";
-                btn.className = "game-btn-secondary text-white font-bold py-3 px-6 rounded-lg w-full";
-            }
+    <h3>1. Mulai dari Beranda</h3>
+    <p>
+      Baca pengantar dan identitas kelompok sebelum memulai pembelajaran.
+    </p>
 
-            // Show animation
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                content.classList.remove('scale-95');
-                content.classList.add('scale-100');
-            }, 10);
-            
-            btn.onclick = () => {
-                // Hide animation
-                modal.classList.add('opacity-0');
-                content.classList.remove('scale-100');
-                content.classList.add('scale-95');
-                
-                setTimeout(() => {
-                    modal.classList.add('hidden');
-                    if(callback) callback();
-                }, 300);
-            };
-        }
+    <h3>2. Pelajari Tujuan Pembelajaran</h3>
+    <p>
+      Pahami kemampuan yang diharapkan setelah menyelesaikan MPI.
+    </p>
 
-        // Init Map UI on load (hidden initially)
-        updateMapUI();
+    <h3>3. Gunakan Peta Sad Darsana</h3>
+    <p>
+      Peta memberikan gambaran singkat mengenai enam sistem filsafat
+      yang termasuk Sad Darsana.
+    </p>
 
-    </script>
+    <h3>4. Buka Materi Sad Darsana</h3>
+    <p>
+      Pada halaman materi terdapat enam tombol. Setiap tombol mewakili
+      satu aliran Darsana.
+    </p>
+
+    <h3>5. Kerjakan Final Quest</h3>
+    <p>
+      Setelah mempelajari materi, kerjakan soal untuk menguji pemahaman.
+    </p>
+
+    <h3>6. Lihat Hasil dan Refleksi</h3>
+    <p>
+      Periksa skor dan tuliskan hal penting yang telah dipelajari.
+    </p>
+
+  </div>
+
+  <button class="btn" onclick="go('tujuan')">
+    Lanjut →
+  </button>
+
+</section>
+
+
+<!-- ================= TUJUAN ================= -->
+
+<section class="page" id="tujuan">
+
+  <h2>🎯 Tujuan Pembelajaran</h2>
+
+  <div class="info-grid">
+
+    <div class="info-card">
+      <div class="icon">📚</div>
+      <h3>Memahami</h3>
+      <p>
+        Peserta didik mampu menjelaskan pengertian Darsana dan
+        Sad Darsana.
+      </p>
+    </div>
+
+    <div class="info-card">
+      <div class="icon">🔎</div>
+      <h3>Mengidentifikasi</h3>
+      <p>
+        Peserta didik mampu mengidentifikasi enam sistem Sad Darsana
+        beserta tokoh dan pokok ajarannya.
+      </p>
+    </div>
+
+    <div class="info-card">
+      <div class="icon">🧠</div>
+      <h3>Menganalisis</h3>
+      <p>
+        Peserta didik mampu membandingkan konsep dari masing-masing
+        sistem Darsana.
+      </p>
+    </div>
+
+    <div class="info-card">
+      <div class="icon">🌱</div>
+      <h3>Menerapkan</h3>
+      <p>
+        Peserta didik mampu menemukan contoh penerapan nilai Darsana
+        dalam kehidupan sehari-hari.
+      </p>
+    </div>
+
+  </div>
+
+  <br>
+
+  <button class="btn" onclick="go('peta')">
+    Lihat Peta Sad Darsana →
+  </button>
+
+</section>
+
+
+<!-- ================= PETA ================= -->
+
+<section class="page" id="peta">
+
+  <h2>🗺️ Peta Sad Darsana</h2>
+
+  <div class="card">
+
+    <p>
+      Sad Darsana berarti <b>enam pandangan atau sistem filsafat</b>.
+      Keenam sistem ini berkembang dalam tradisi filsafat India dan
+      dikenal sebagai sistem Astika karena menerima otoritas Veda.
+    </p>
+
+    <p>
+      Keenam sistem tersebut adalah Nyaya, Vaisesika, Samkhya,
+      Yoga, Mimamsa, dan Vedanta.
+    </p>
+
+  </div>
+
+
+  <div class="peta-grid">
+
+    <div class="peta-card" onclick="openMateri('nyaya')">
+      <div class="hero-icon" style="font-size:40px;">🔍</div>
+      <h3>Nyaya</h3>
+      <p>
+        Penalaran, logika, dan cara memperoleh pengetahuan yang benar.
+      </p>
+    </div>
+
+    <div class="peta-card" onclick="openMateri('vaisesika')">
+      <div class="hero-icon" style="font-size:40px;">⚛️</div>
+      <h3>Vaisesika</h3>
+      <p>
+        Analisis realitas, benda, sifat, tindakan, dan unsur penyusun alam.
+      </p>
+    </div>
+
+    <div class="peta-card" onclick="openMateri('samkhya')">
+      <div class="hero-icon" style="font-size:40px;">⚖️</div>
+      <h3>Samkhya</h3>
+      <p>
+        Hubungan Purusa dan Prakriti serta perkembangan unsur realitas.
+      </p>
+    </div>
+
+    <div class="peta-card" onclick="openMateri('yoga')">
+      <div class="hero-icon" style="font-size:40px;">🧘</div>
+      <h3>Yoga</h3>
+      <p>
+        Pengendalian pikiran dan latihan spiritual menuju kebebasan.
+      </p>
+    </div>
+
+    <div class="peta-card" onclick="openMateri('mimamsa')">
+      <div class="hero-icon" style="font-size:40px;">🔥</div>
+      <h3>Mimamsa</h3>
+      <p>
+        Penafsiran Veda, dharma, kewajiban, dan tindakan ritual.
+      </p>
+    </div>
+
+    <div class="peta-card" onclick="openMateri('vedanta')">
+      <div class="hero-icon" style="font-size:40px;">🌌</div>
+      <h3>Vedanta</h3>
+      <p>
+        Brahman, Atman, pengetahuan, dan tujuan pembebasan.
+      </p>
+    </div>
+
+  </div>
+
+  <br>
+
+  <button class="btn" onclick="go('materi')">
+    📚 Buka Materi Lengkap
+  </button>
+
+</section>
+
+
+<!-- ================= MATERI ================= -->
+
+<section class="page" id="materi">
+
+  <h2>📚 Materi Sad Darsana</h2>
+
+  <div class="card">
+
+    <p>
+      Pilih salah satu dari enam tombol di bawah untuk mempelajari
+      sistem filsafat Sad Darsana secara lebih mendalam.
+    </p>
+
+  </div>
+
+
+  <div class="darsana-buttons">
+
+    <button class="darsana-btn active"
+            id="btn-nyaya"
+            onclick="setMateri('nyaya')">
+
+      <span class="darsana-icon">🔍</span>
+      NYAYA
+
+    </button>
+
+    <button class="darsana-btn"
+            id="btn-vaisesika"
+            onclick="setMateri('vaisesika')">
+
+      <span class="darsana-icon">⚛️</span>
+      VAISESIKA
+
+    </button>
+
+    <button class="darsana-btn"
+            id="btn-samkhya"
+            onclick="setMateri('samkhya')">
+
+      <span class="darsana-icon">⚖️</span>
+      SAMKHYA
+
+    </button>
+
+    <button class="darsana-btn"
+            id="btn-yoga"
+            onclick="setMateri('yoga')">
+
+      <span class="darsana-icon">🧘</span>
+      YOGA
+
+    </button>
+
+    <button class="darsana-btn"
+            id="btn-mimamsa"
+            onclick="setMateri('mimamsa')">
+
+      <span class="darsana-icon">🔥</span>
+      MIMAMSA
+
+    </button>
+
+    <button class="darsana-btn"
+            id="btn-vedanta"
+            onclick="setMateri('vedanta')">
+
+      <span class="darsana-icon">🌌</span>
+      VEDANTA
+
+    </button>
+
+  </div>
+
+
+  <div class="material-box" id="materiContent"></div>
+
+
+  <div class="navigation">
+
+    <button class="btn secondary"
+            onclick="previousMateri()">
+      ← Sebelumnya
+    </button>
+
+    <button class="btn"
+            onclick="nextMateri()">
+      Berikutnya →
+    </button>
+
+  </div>
+
+</section>
+
+
+<!-- ================= ASTIKA ================= -->
+
+<section class="page" id="astika">
+
+  <h2>☯️ Astika dan Nastika</h2>
+
+  <div class="card">
+
+    <h3>Astika</h3>
+
+    <p>
+      Astika adalah istilah yang digunakan untuk sistem pemikiran
+      yang menerima otoritas atau kewibawaan Veda. Dalam pembahasan
+      Sad Darsana, keenam sistem yaitu Nyaya, Vaisesika, Samkhya,
+      Yoga, Mimamsa, dan Vedanta termasuk kelompok Astika.
+    </p>
+
+    <div class="highlight">
+      <b>Intinya:</b>
+      Astika menerima Veda sebagai sumber otoritatif dalam kerangka filsafatnya.
+    </div>
+
+
+    <h3>Nastika</h3>
+
+    <p>
+      Nastika digunakan untuk menyebut sistem pemikiran yang tidak
+      menerima otoritas Veda sebagai dasar utama. Dalam sejarah
+      filsafat India, Buddhisme, Jainisme, dan Carvaka sering
+      dikelompokkan sebagai Nastika.
+    </p>
+
+    <div class="highlight">
+      <b>Catatan:</b>
+      Pengelompokan Astika dan Nastika terutama berkaitan dengan
+      penerimaan terhadap otoritas Veda.
+    </div>
+
+  </div>
+
+  <button class="btn" onclick="go('penerapan')">
+    Lanjut ke Penerapan →
+  </button>
+
+</section>
+
+
+<!-- ================= PENERAPAN ================= -->
+
+<section class="page" id="penerapan">
+
+  <h2>🌱 Penerapan Darsana dalam Kehidupan</h2>
+
+  <div class="card">
+
+    <h3>🔍 Nyaya — Berpikir Logis</h3>
+
+    <p>
+      Nyaya dapat diterapkan ketika seseorang tidak langsung percaya
+      pada suatu informasi, tetapi memeriksa bukti dan menggunakan
+      penalaran sebelum mengambil kesimpulan.
+    </p>
+
+    <h3>⚛️ Vaisesika — Mengamati Realitas</h3>
+
+    <p>
+      Vaisesika mendorong manusia untuk mengamati dan menganalisis
+      berbagai objek, sifat, serta hubungan antarhal secara sistematis.
+    </p>
+
+    <h3>⚖️ Samkhya — Mengenali Diri</h3>
+
+    <p>
+      Samkhya mengajarkan pembedaan antara kesadaran atau Purusa
+      dengan Prakriti. Dalam kehidupan sehari-hari, hal ini dapat
+      dikaitkan dengan usaha memahami pikiran, emosi, dan keadaan diri.
+    </p>
+
+    <h3>🧘 Yoga — Mengendalikan Pikiran</h3>
+
+    <p>
+      Yoga dapat diterapkan melalui disiplin diri, pengendalian pikiran,
+      konsentrasi, serta kebiasaan hidup yang teratur.
+    </p>
+
+    <h3>🔥 Mimamsa — Menjalankan Kewajiban</h3>
+
+    <p>
+      Mimamsa menekankan pentingnya dharma dan tindakan yang sesuai
+      dengan kewajiban.
+    </p>
+
+    <h3>🌌 Vedanta — Mencari Pengetahuan</h3>
+
+    <p>
+      Vedanta menekankan pencarian pengetahuan mengenai realitas,
+      Atman, Brahman, dan pembebasan.
+    </p>
+
+  </div>
+
+  <button class="btn" onclick="go('quiz')">
+    ⚔️ Mulai Final Quest
+  </button>
+
+</section>
+
+
+<!-- ================= QUIZ ================= -->
+
+<section class="page" id="quiz">
+
+  <h2>⚔️ FINAL QUEST</h2>
+
+  <div class="card">
+    <p>
+      Jawablah seluruh soal berikut berdasarkan materi yang telah dipelajari.
+    </p>
+  </div>
+
+  <div id="quizContainer"></div>
+
+  <button class="btn green" onclick="calculateScore()">
+    🏆 Periksa Jawaban
+  </button>
+
+</section>
+
+
+<!-- ================= SCORE ================= -->
+
+<section class="page" id="score">
+
+  <div class="score-box">
+
+    <h2>🏆 HASIL BELAJAR</h2>
+
+    <div class="score-number" id="scoreNumber">
+      -
+    </div>
+
+    <p id="scoreMessage">
+      Belum ada hasil.
+    </p>
+
+    <br>
+
+    <button class="btn" onclick="go('refleksi')">
+      💭 Lanjut ke Refleksi
+    </button>
+
+  </div>
+
+</section>
+
+
+<!-- ================= REFLEKSI ================= -->
+
+<section class="page" id="refleksi">
+
+  <h2>💭 Refleksi</h2>
+
+  <div class="card">
+
+    <h3>
+      Apa hal paling penting yang kamu pelajari?
+    </h3>
+
+    <textarea
+      id="reflection"
+      placeholder="Tuliskan refleksi kamu di sini..."
+    ></textarea>
+
+    <br><br>
+
+    <button class="btn green" onclick="saveReflection()">
+      💾 Simpan Refleksi
+    </button>
+
+    <p id="reflectionMessage"></p>
+
+  </div>
+
+
+  <div class="card">
+
+    <h3>✨ Kesimpulan</h3>
+
+    <p>
+      Sad Darsana merupakan enam sistem filsafat dalam tradisi
+      India yang memberikan berbagai cara untuk memahami pengetahuan,
+      realitas, diri manusia, tindakan, dan tujuan kehidupan.
+    </p>
+
+    <p>
+      Masing-masing sistem mempunyai fokus yang berbeda, tetapi
+      keseluruhannya dapat membantu manusia mengembangkan cara
+      berpikir yang lebih kritis, terarah, disiplin, dan bijaksana.
+    </p>
+
+  </div>
+
+</section>
+
+
+<script>
+
+/* =====================================================
+   NAVIGASI HALAMAN
+===================================================== */
+
+const pages = [
+  "home",
+  "petunjuk",
+  "tujuan",
+  "peta",
+  "materi",
+  "astika",
+  "penerapan",
+  "quiz",
+  "score",
+  "refleksi"
+];
+
+function go(id) {
+
+  document.querySelectorAll(".page").forEach(function(page) {
+    page.classList.remove("active");
+  });
+
+  const target = document.getElementById(id);
+
+  if (target) {
+    target.classList.add("active");
+  }
+
+  const dropdown = document.getElementById("dropdownMenu");
+
+  if (dropdown) {
+    dropdown.classList.remove("show");
+  }
+
+  updateProgress(id);
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+}
+
+
+/* =====================================================
+   MENU
+===================================================== */
+
+function toggleMenu() {
+
+  const menu = document.getElementById("dropdownMenu");
+
+  menu.classList.toggle("show");
+}
+
+
+document.addEventListener("click", function(event) {
+
+  const menuWrap = document.querySelector(".menu-wrap");
+
+  if (!menuWrap.contains(event.target)) {
+
+    document.getElementById("dropdownMenu")
+      .classList.remove("show");
+
+  }
+
+});
+
+
+/* =====================================================
+   PROGRESS BAR
+===================================================== */
+
+function updateProgress(id) {
+
+  let index = pages.indexOf(id);
+
+  if (index < 0) {
+    index = 0;
+  }
+
+  const percent =
+    (index / (pages.length - 1)) * 100;
+
+  document.getElementById("progressBar")
+    .style.width = percent + "%";
+}
+
+
+/* =====================================================
+   DATA MATERI
+===================================================== */
+
+const materiOrder = [
+  "nyaya",
+  "vaisesika",
+  "samkhya",
+  "yoga",
+  "mimamsa",
+  "vedanta"
+];
+
+let currentMateri = "nyaya";
+
+
+const materiData = {
+
+  nyaya: {
+
+    title: "🔍 NYAYA",
+
+    subtitle:
+      "Filsafat penalaran, logika, dan pengetahuan yang benar.",
+
+    content: `
+
+      <div class="material-section">
+
+        <h3>1. Pengertian</h3>
+
+        <p>
+          Nyaya merupakan salah satu dari enam sistem filsafat India
+          atau Sad Darsana. Nyaya berkaitan dengan cara berpikir yang benar,
+          penalaran, dan metode memperoleh pengetahuan yang benar.
+        </p>
+
+        <p>
+          Sistem Nyaya memberikan perhatian besar terhadap logika.
+          Tujuannya adalah membantu manusia membedakan pengetahuan yang
+          benar dari kesalahan pengetahuan sehingga seseorang dapat mencapai
+          pemahaman yang lebih tepat terhadap kenyataan.
+        </p>
+
+      </div>
+
+
+      <div class="material-section">
+
+        <h3>2. Tokoh</h3>
+
+        <p>
+          Tokoh utama yang dikaitkan dengan sistem Nyaya adalah
+          <b>Gautama atau Aksapada Gautama</b>.
+          Ajarannya dikenal melalui <b>Nyaya Sutra</b>.
+        </p>
+
+      </div>
+
+
+      <div class="material-section">
+
+        <h3>3. Pokok Ajaran</h3>
+
+        <p>
+          Nyaya menekankan pentingnya pengetahuan yang benar sebagai
+          jalan untuk mengatasi kesalahan dan mencapai pembebasan.
+          Untuk memperoleh pengetahuan yang benar, seseorang harus
+          menggunakan cara berpikir dan sumber pengetahuan yang dapat
+          dipertanggungjawabkan.
+        </p>
+
+      </div>
+
+
+      <div class="material-section">
+
+        <h3>4. Pramana</h3>
+
+        <p>
+          Nyaya membahas beberapa cara memperoleh pengetahuan yang benar,
+          antara lain:
+        </p>
+
+        <ul>
+
+          <li>
+            <b>Pratyaksa</b> — pengetahuan melalui pengamatan langsung.
+          </li>
+
+          <li>
+            <b>Anumana</b> — pengetahuan melalui penyimpulan atau inferensi.
+          </li>
+
+          <li>
+            <b>Upamana</b> — pengetahuan melalui perbandingan atau analogi.
+          </li>
+
+          <li>
+            <b>Sabda</b> — pengetahuan melalui kesaksian yang dapat dipercaya.
+          </li>
+
+        </ul>
+
+      </div>
+
+
+      <div class="example">
+
+        <b>Contoh:</b><br>
+
+        Seseorang melihat asap dari kejauhan. Berdasarkan pengetahuan
+        bahwa asap biasanya berkaitan dengan api, ia menyimpulkan bahwa
+        kemungkinan terdapat api di tempat tersebut. Proses ini merupakan
+        contoh penalaran atau <i>anumana</i>.
+
+      </div>
+
+
+      <div class="material-section">
+
+        <h3>5. Ciri Khas</h3>
+
+        <ul>
+
+          <li>Menekankan logika dan penalaran.</li>
+
+          <li>Membahas sumber pengetahuan yang benar.</li>
+
+          <li>Mendorong pemeriksaan terhadap suatu kesimpulan.</li>
+
+          <li>Berhubungan erat dengan Vaisesika.</li>
+
+        </ul>
+
+      </div>
+
+
+      <div class="highlight">
+
+        <b>Inti Nyaya:</b>
+        Gunakan penalaran dan sumber pengetahuan yang tepat untuk
+        memperoleh pemahaman yang benar.
+
+      </div>
+
+    `
+  },
+
+
+  vaisesika: {
+
+    title: "⚛️ VAISESIKA",
+
+    subtitle:
+      "Filsafat yang menganalisis realitas dan kategori-kategori keberadaan.",
+
+    content: `
+
+      <div class="material-section">
+
+        <h3>1. Pengertian</h3>
+
+        <p>
+          Vaisesika merupakan salah satu sistem filsafat Sad Darsana
+          yang berusaha memahami realitas dengan mengelompokkan berbagai
+          hal yang ada ke dalam kategori tertentu.
+        </p>
+
+        <p>
+          Sistem ini terkenal karena pembahasannya mengenai unsur-unsur
+          realitas, sifat benda, tindakan, serta hubungan antara berbagai
+          objek.
+        </p>
+
+      </div>
+
+
+      <div class="material-section">
+
+        <h3>2. Tokoh</h3>
+
+        <p>
+          Tokoh utama Vaisesika adalah <b>Kanada</b>, yang ajarannya
+          dihubungkan dengan karya <b>Vaisesika Sutra</b>.
+        </p>
+
+      </div>
+
+
+      <div class="material-section">
+
+        <h3>3. Padartha</h3>
+
+        <p>
+          Salah satu bagian penting Vaisesika adalah konsep
+          <b>padartha</b>, yaitu kategori-kategori yang digunakan untuk
+          menganalisis kenyataan.
+        </p>
+
+        <ul>
+
+          <li><b>Dravya</b> — substansi atau benda.</li>
+
+          <li><b>Guna</b> — sifat atau kualitas.</li>
+
+          <li><b>Karma</b> — tindakan atau gerak.</li>
+
+          <li><b>Samanya</b> — sifat umum.</li>
+
+          <li><b>Visesa</b> — kekhususan atau perbedaan khusus.</li>
+
+          <li><b>Samavaya</b> — hubungan inheren.</li>
+
+          <li>
+            <b>Abhava</b> — ketiadaan, yang kemudian dibahas sebagai
+            kategori tambahan.
+          </li>
+
+        </ul>
+
+      </div>
+
+
+      <div class="material-section">
+
+        <h3>4. Konsep Atom</h3>
+
+        <p>
+          Vaisesika dikenal dengan pembahasannya mengenai
+          <b>anu</b> atau partikel sangat kecil sebagai penyusun benda.
+          Dunia fisik dapat dianalisis melalui unsur-unsur dasar yang
+          sangat kecil.
+        </p>
+
+      </div>
+
+
+      <div class="material-section">
+
+        <h3>5. Hubungan dengan Nyaya</h3>
+
+        <p>
+          Nyaya dan Vaisesika kemudian berkembang sangat dekat.
+          Nyaya lebih menonjolkan logika dan teori pengetahuan,
+          sedangkan Vaisesika lebih menekankan analisis kategori realitas.
+          Keduanya saling melengkapi dalam pembahasan filsafat.
+        </p>
+
+      </div>
+
+
+      <div class="example">
+
+        <b>Contoh:</b><br>
+
+        Ketika seseorang mengamati sebuah benda, ia dapat membedakan
+        bendanya, sifatnya, gerakannya, serta hubungan benda tersebut
+        dengan benda lain. Cara menganalisis objek secara terstruktur
+        memiliki kemiripan dengan pendekatan Vaisesika.
+
+      </div>
+
+
+      <div class="highlight">
+
+        <b>Inti Vaisesika:</b>
+        Memahami realitas dengan mengelompokkan dan menganalisis
+        berbagai kategori keberadaan.
+
+      </div>
+
+    `
+  },
+
+
+  samkhya: {
+
+    title: "⚖️ SAMKHYA",
+
+    subtitle:
+      "Filsafat tentang Purusa, Prakriti, dan perkembangan realitas.",
+
+    content: `
+
+      <div class="material-section">
+
+        <h3>1. Pengertian</h3>
+
+        <p>
+          Samkhya merupakan sistem filsafat yang memberikan penjelasan
+          mengenai realitas melalui pembedaan antara <b>Purusa</b>
+          dan <b>Prakriti</b>.
+        </p>
+
+        <p>
+          Samkhya berusaha menjelaskan bagaimana pengalaman manusia
+          dan alam dapat dipahami melalui berbagai unsur atau prinsip
+          realitas.
+        </p>
+
+      </div>
+
+
+      <div class="material-section">
+
+        <h3>2. Tokoh</h3>
+
+        <p>
+          Tokoh yang secara tradisional dikaitkan dengan Samkhya adalah
+          <b>Kapila</b>.
+        </p>
+
+      </div>
+
+
+      <div class="material-section">
+
+        <h3>3. Purusa dan Prakriti</h3>
+
+        <ul>
+
+          <li>
+            <b>Purusa</b> adalah prinsip kesadaran yang menyaksikan
+            pengalaman.
+          </li>
+
+          <li>
+            <b>Prakriti</b> adalah prinsip alam atau materi yang menjadi
+            dasar perkembangan berbagai fenomena.
+          </li>
+
+        </ul>
+
+        <p>
+          Pembedaan keduanya menjadi dasar penting dalam filsafat Samkhya.
+          Manusia mengalami keterikatan ketika tidak memahami perbedaan
+          antara Purusa dan Prakriti dengan benar.
+        </p>
+
+      </div>
+
+
+      <div class="material-section">
+
+        <h3>4. Tiga Guna</h3>
+
+        <p>
+          Prakriti memiliki tiga unsur atau <b>guna</b>, yaitu:
+        </p>
+
+        <ul>
+
+          <li>
+            <b>Sattva</b> — kejernihan, keseimbangan, dan pengetahuan.
+          </li>
+
+          <li>
+            <b>Rajas</b> — aktivitas, gerak, dan dorongan.
+          </li>
+
+          <li>
+            <b>Tamas</b> — kegelapan, kelembaman, dan ketidakjelasan.
+          </li>
+
+        </ul>
+
+      </div>
+
+
+      <div class="material-section">
+
+        <h3>5. Tattva</h3>
+
+        <p>
+          Samkhya klasik terkenal dengan analisis <b>25 tattva</b>
+          atau prinsip realitas. Sistem tersebut menjelaskan perkembangan
+          Prakriti hingga menghasilkan berbagai aspek alam dan pengalaman
+          manusia.
+        </p>
+
+      </div>
+
+
+      <div class="material-section">
+
+        <h3>6. Tujuan</h3>
+
+        <p>
+          Tujuan akhirnya adalah pembebasan atau <b>kaivalya</b>,
+          yaitu terbebas dari keterikatan melalui pengetahuan yang benar
+          mengenai perbedaan antara Purusa dan Prakriti.
+        </p>
+
+      </div>
+
+
+      <div class="example">
+
+        <b>Contoh:</b><br>
+
+        Seseorang belajar menyadari bahwa pikiran dan emosi dapat berubah.
+        Dengan demikian, ia berusaha memahami bahwa kesadaran tidak selalu
+        sama dengan keadaan pikiran atau emosi yang sedang dialaminya.
+
+      </div>
+
+
+      <div class="highlight">
+
+        <b>Inti Samkhya:</b>
+        Memahami perbedaan Purusa dan Prakriti untuk memperoleh
+        pengetahuan yang membawa pada pembebasan.
+
+      </div>
+
+    `
+  },
+
+
+  yoga: {
+
+    title: "🧘 YOGA",
+
+    subtitle:
+      "Jalan disiplin dan pengendalian pikiran menuju pembebasan.",
+
+    content: `
+
+      <div class="material-section">
+
+        <h3>1. Pengertian</h3>
+
+        <p>
+          Yoga merupakan salah satu sistem Sad Darsana yang memberikan
+          penekanan kuat pada praktik disiplin diri dan pengendalian pikiran.
+          Yoga tidak hanya dipahami sebagai latihan fisik, tetapi sebagai
+          jalan spiritual yang sistematis.
+        </p>
+
+      </div>
+
+
+      <div class="material-section">
+
+        <h3>2. Tokoh</h3>
+
+        <p>
+          Tokoh utama dalam sistem Yoga adalah <b>Patanjali</b>.
+          Ajarannya dikenal melalui <b>Yoga Sutra</b>.
+        </p>
+
+      </div>
+
+
+      <div class="material-section">
+
+        <h3>3. Hubungan dengan Samkhya</h3>
+
+        <p>
+          Yoga memiliki hubungan yang erat dengan Samkhya karena banyak
+          menggunakan kerangka pemikiran Samkhya. Perbedaannya, Yoga lebih
+          menonjolkan aspek praktik dan disiplin spiritual.
+        </p>
+
+      </div>
+
+
+      <div class="material-section">
+
+        <h3>4. Astanga Yoga</h3>
+
+        <p>
+          Dalam Yoga Sutra dikenal jalan <b>Astanga Yoga</b> atau
+          delapan anggota Yoga:
+        </p>
+
+        <ul>
+
+          <li><b>Yama</b> — pengendalian perilaku terhadap lingkungan.</li>
+
+          <li><b>Niyama</b> — disiplin dan pengendalian diri.</li>
+
+          <li><b>Asana</b> — sikap atau posisi tubuh.</li>
+
+          <li><b>Pranayama</b> — pengaturan pernapasan.</li>
+
+          <li><b>Pratyahara</b> — pengendalian indra.</li>
+
+          <li><b>Dharana</b> — konsentrasi.</li>
+
+          <li><b>Dhyana</b> — meditasi.</li>
+
+          <li><b>Samadhi</b> — keadaan konsentrasi mendalam.</li>
+
+        </ul>
+
+      </div>
+
+
+      <div class="material-section">
+
+        <h3>5. Pengendalian Pikiran</h3>
+
+        <p>
+          Yoga berusaha mengendalikan aktivitas pikiran agar kesadaran
+          tidak terus-menerus dikuasai oleh gangguan mental dan keinginan
+          yang tidak terkendali.
+        </p>
+
+      </div>
+
+
+      <div class="material-section">
+
+        <h3>6. Tujuan</h3>
+
+        <p>
+          Tujuan Yoga adalah mencapai keadaan kebebasan atau
+          <b>kaivalya</b>. Prosesnya dilakukan melalui disiplin,
+          konsentrasi, meditasi, dan pengembangan kesadaran.
+        </p>
+
+      </div>
+
+
+      <div class="example">
+
+        <b>Contoh:</b><br>
+
+        Sebelum belajar, siswa dapat mengambil waktu sejenak untuk
+        menenangkan diri dan memusatkan perhatian agar kegiatan belajar
+        lebih fokus.
+
+      </div>
+
+
+      <div class="highlight">
+
+        <b>Inti Yoga:</b>
+        Melatih disiplin dan mengendalikan pikiran melalui tahapan
+        praktik untuk mencapai kebebasan.
+
+      </div>
+
+    `
+  },
+
+
+  mimamsa: {
+
+    title: "🔥 MIMAMSA",
+
+    subtitle:
+      "Filsafat tentang Veda, dharma, kewajiban, dan tindakan.",
+
+    content: `
+
+      <div class="material-section">
+
+        <h3>1. Pengertian</h3>
+
+        <p>
+          Mimamsa atau <b>Purva Mimamsa</b> merupakan salah satu
+          sistem Sad Darsana yang banyak membahas penafsiran Veda,
+          terutama bagian yang berhubungan dengan tindakan, kewajiban,
+          dan ritual.
+        </p>
+
+        <p>
+          Purva berarti bagian terdahulu. Sistem ini sering dibandingkan
+          dengan Vedanta yang dikenal sebagai Uttara Mimamsa.
+        </p>
+
+      </div>
+
+
+      <div class="material-section">
+
+        <h3>2. Tokoh</h3>
+
+        <p>
+          Tokoh utama Mimamsa adalah <b>Jaimini</b>. Ajarannya
+          dikaitkan dengan karya <b>Mimamsa Sutra</b> atau
+          Jaimini Sutra.
+        </p>
+
+      </div>
+
+
+      <div class="material-section">
+
+        <h3>3. Otoritas Veda</h3>
+
+        <p>
+          Mimamsa memberikan kedudukan penting kepada Veda sebagai
+          sumber pengetahuan mengenai dharma. Karena itu, penafsiran
+          terhadap pernyataan dan aturan Veda menjadi bagian penting
+          dalam sistem ini.
+        </p>
+
+      </div>
+
+
+      <div class="material-section">
+
+        <h3>4. Dharma dan Karma</h3>
+
+        <p>
+          Mimamsa menekankan pentingnya melaksanakan <b>dharma</b>,
+          yaitu kewajiban atau tindakan yang sesuai dengan aturan
+          dan tatanan kehidupan.
+        </p>
+
+        <p>
+          Tindakan manusia memiliki akibat. Karena itu, seseorang
+          perlu melakukan kewajiban dengan benar dan bertanggung jawab.
+        </p>
+
+      </div>
+
+
+      <div class="material-section">
+
+        <h3>5. Penafsiran</h3>
+
+        <p>
+          Mimamsa mengembangkan metode untuk memahami bahasa dan
+          pernyataan Veda secara sistematis. Hal ini diperlukan agar
+          seseorang dapat menentukan maksud suatu ajaran serta tindakan
+          yang seharusnya dilakukan.
+        </p>
+
+      </div>
+
+
+      <div class="example">
+
+        <b>Contoh:</b><br>
+
+        Seorang siswa memiliki kewajiban belajar, menaati aturan sekolah,
+        menghormati guru, dan menyelesaikan tugas. Melaksanakan kewajiban
+        dengan sungguh-sungguh merupakan contoh sederhana nilai tanggung jawab.
+
+      </div>
+
+
+      <div class="highlight">
+
+        <b>Inti Mimamsa:</b>
+        Memahami dan melaksanakan dharma serta kewajiban berdasarkan
+        penafsiran terhadap ajaran Veda.
+
+      </div>
+
+    `
+  },
+
+
+  vedanta: {
+
+    title: "🌌 VEDANTA",
+
+    subtitle:
+      "Filsafat tentang Brahman, Atman, pengetahuan, dan pembebasan.",
+
+    content: `
+
+      <div class="material-section">
+
+        <h3>1. Pengertian</h3>
+
+        <p>
+          Vedanta dikenal sebagai <b>Uttara Mimamsa</b> atau bagian
+          akhir dari Veda. Sistem ini berkembang dari pemikiran yang
+          terdapat dalam Upanishad dan membahas persoalan mendasar
+          mengenai realitas, diri, dan pembebasan.
+        </p>
+
+        <p>
+          Vedanta merupakan salah satu sistem filsafat India yang
+          sangat berpengaruh dalam perkembangan pemikiran Hindu.
+        </p>
+
+      </div>
+
+
+      <div class="material-section">
+
+        <h3>2. Dasar Pemikiran</h3>
+
+        <p>
+          Sumber utama pemikiran Vedanta sering diringkas melalui
+          tiga landasan yang dikenal sebagai <b>Prasthanatrayi</b>:
+        </p>
+
+        <ul>
+
+          <li><b>Upanishad</b></li>
+
+          <li><b>Bhagavad Gita</b></li>
+
+          <li><b>Brahma Sutra</b></li>
+
+        </ul>
+
+      </div>
+
+
+      <div class="material-section">
+
+        <h3>3. Brahman dan Atman</h3>
+
+        <p>
+          <b>Brahman</b> dipahami sebagai realitas tertinggi,
+          sedangkan <b>Atman</b> berkaitan dengan diri atau hakikat
+          kesadaran. Hubungan antara Atman dan Brahman menjadi salah
+          satu persoalan utama dalam berbagai aliran Vedanta.
+        </p>
+
+      </div>
+
+
+      <div class="material-section">
+
+        <h3>4. Moksha</h3>
+
+        <p>
+          Tujuan utama Vedanta adalah <b>moksha</b>, yaitu pembebasan
+          dari keterikatan dan siklus kelahiran kembali. Jalan menuju
+          pembebasan dapat ditekankan melalui pengetahuan, pengabdian,
+          maupun bentuk praktik lainnya sesuai dengan aliran Vedanta.
+        </p>
+
+      </div>
+
+
+      <div class="material-section">
+
+        <h3>5. Berbagai Aliran Vedanta</h3>
+
+        <ul>
+
+          <li>
+            <b>Advaita Vedanta</b> — dikaitkan dengan Adi Shankara
+            dan menekankan non-dualisme.
+          </li>
+
+          <li>
+            <b>Vishishtadvaita</b> — dikaitkan dengan Ramanuja dan
+            menjelaskan realitas sebagai kesatuan yang memiliki
+            perbedaan yang bermakna.
+          </li>
+
+          <li>
+            <b>Dvaita</b> — dikaitkan dengan Madhva dan menekankan
+            adanya perbedaan antara Tuhan dan jiwa.
+          </li>
+
+        </ul>
+
+      </div>
+
+
+      <div class="example">
+
+        <b>Contoh:</b><br>
+
+        Seseorang dapat mengembangkan sikap introspektif dengan
+        berusaha mengenal dirinya, memahami tujuan hidup, serta
+        mengembangkan pengetahuan dan kebijaksanaan dalam mengambil
+        keputusan.
+
+      </div>
+
+
+      <div class="highlight">
+
+        <b>Inti Vedanta:</b>
+        Mencari pemahaman mengenai realitas tertinggi, hakikat diri,
+        dan jalan menuju moksha.
+
+      </div>
+
+    `
+  }
+
+};
+
+
+/* =====================================================
+   TAMPILKAN MATERI
+===================================================== */
+
+function setMateri(type) {
+
+  if (!materiData[type]) {
+    return;
+  }
+
+  currentMateri = type;
+
+  const data = materiData[type];
+
+  const content = document.getElementById("materiContent");
+
+  content.innerHTML =
+    '<div class="material-title">' +
+    data.title +
+    '</div>' +
+
+    '<div class="material-subtitle">' +
+    data.subtitle +
+    '</div>' +
+
+    data.content;
+
+
+  document.querySelectorAll(".darsana-btn")
+    .forEach(function(button) {
+      button.classList.remove("active");
+    });
+
+
+  const selectedButton =
+    document.getElementById("btn-" + type);
+
+  if (selectedButton) {
+    selectedButton.classList.add("active");
+  }
+
+}
+
+
+/* =====================================================
+   BUKA MATERI DARI PETA
+===================================================== */
+
+function openMateri(type) {
+
+  setMateri(type);
+
+  go("materi");
+
+}
+
+
+/* =====================================================
+   NAVIGASI MATERI
+
+   NYAYA:
+   Sebelumnya → Peta
+
+   VAISESIKA:
+   Sebelumnya → Nyaya
+
+   SAMKHYA:
+   Sebelumnya → Vaisesika
+
+   YOGA:
+   Sebelumnya → Samkhya
+
+   MIMAMSA:
+   Sebelumnya → Yoga
+
+   VEDANTA:
+   Sebelumnya → Mimamsa
+
+   VEDANTA:
+   Berikutnya → Astika & Nastika
+===================================================== */
+
+function nextMateri() {
+
+  const index =
+    materiOrder.indexOf(currentMateri);
+
+  if (index < materiOrder.length - 1) {
+
+    setMateri(
+      materiOrder[index + 1]
+    );
+
+  } else {
+
+    go("astika");
+
+  }
+
+}
+
+
+function previousMateri() {
+
+  const index =
+    materiOrder.indexOf(currentMateri);
+
+  if (index > 0) {
+
+    setMateri(
+      materiOrder[index - 1]
+    );
+
+  } else {
+
+    go("peta");
+
+  }
+
+}
+
+
+/* =====================================================
+   QUIZ
+===================================================== */
+
+const questions = [
+
+  {
+    q: "Apa arti umum dari Darsana?",
+    options: [
+      "Upacara keagamaan",
+      "Pandangan atau filsafat",
+      "Tempat ibadah",
+      "Kitab suci"
+    ],
+    answer: "b"
+  },
+
+  {
+    q: "Berapa jumlah sistem dalam Sad Darsana?",
+    options: [
+      "Empat",
+      "Lima",
+      "Enam",
+      "Delapan"
+    ],
+    answer: "c"
+  },
+
+  {
+    q: "Tokoh utama sistem Nyaya adalah...",
+    options: [
+      "Kapila",
+      "Jaimini",
+      "Gautama",
+      "Kanada"
+    ],
+    answer: "c"
+  },
+
+  {
+    q: "Sistem Vaisesika dikaitkan dengan tokoh...",
+    options: [
+      "Kanada",
+      "Patanjali",
+      "Shankara",
+      "Kapila"
+    ],
+    answer: "a"
+  },
+
+  {
+    q: "Konsep utama Samkhya yang membedakan kesadaran dan alam adalah...",
+    options: [
+      "Atman dan Brahman",
+      "Purusa dan Prakriti",
+      "Dharma dan Karma",
+      "Sabda dan Anumana"
+    ],
+    answer: "b"
+  },
+
+  {
+    q: "Tokoh yang dikenal dengan Yoga Sutra adalah...",
+    options: [
+      "Jaimini",
+      "Patanjali",
+      "Kanada",
+      "Ramanuja"
+    ],
+    answer: "b"
+  },
+
+  {
+    q: "Berikut yang termasuk Astanga Yoga adalah...",
+    options: [
+      "Dharana",
+      "Carvaka",
+      "Jainisme",
+      "Vedanta"
+    ],
+    answer: "a"
+  },
+
+  {
+    q: "Tokoh utama Purva Mimamsa adalah...",
+    options: [
+      "Jaimini",
+      "Kapila",
+      "Gautama",
+      "Madhva"
+    ],
+    answer: "a"
+  },
+
+  {
+    q: "Vedanta juga dikenal sebagai...",
+    options: [
+      "Purva Mimamsa",
+      "Uttara Mimamsa",
+      "Nyaya Sutra",
+      "Yoga Sutra"
+    ],
+    answer: "b"
+  },
+
+  {
+    q: "Realitas tertinggi dalam pembahasan Vedanta disebut...",
+    options: [
+      "Prakriti",
+      "Brahman",
+      "Rajas",
+      "Karma"
+    ],
+    answer: "b"
+  },
+
+  {
+    q: "Yang termasuk cara memperoleh pengetahuan dalam Nyaya adalah...",
+    options: [
+      "Pratyaksa",
+      "Yama",
+      "Samadhi",
+      "Kaivalya"
+    ],
+    answer: "a"
+  },
+
+  {
+    q: "Tiga guna dalam Samkhya adalah...",
+    options: [
+      "Atman, Brahman, Moksha",
+      "Sattva, Rajas, Tamas",
+      "Yama, Niyama, Asana",
+      "Dharma, Artha, Kama"
+    ],
+    answer: "b"
+  },
+
+  {
+    q: "Sistem yang banyak membahas kategori keberadaan disebut...",
+    options: [
+      "Yoga",
+      "Vaisesika",
+      "Mimamsa",
+      "Vedanta"
+    ],
+    answer: "b"
+  },
+
+  {
+    q: "Buddhisme dan Jainisme sering dikelompokkan sebagai...",
+    options: [
+      "Astika",
+      "Nastika",
+      "Vedanta",
+      "Nyaya"
+    ],
+    answer: "b"
+  },
+
+  {
+    q: "Tujuan pembebasan dalam banyak sistem filsafat India berkaitan dengan...",
+    options: [
+      "Moksha atau kebebasan",
+      "Kekayaan",
+      "Kemenangan",
+      "Kekuasaan"
+    ],
+    answer: "a"
+  }
+
+];
+
+
+/* =====================================================
+   LOAD QUIZ
+===================================================== */
+
+function loadQuiz() {
+
+  const container =
+    document.getElementById("quizContainer");
+
+  container.innerHTML = "";
+
+  questions.forEach(function(item, index) {
+
+    let html =
+      '<div class="question">' +
+
+      '<h3>' +
+      (index + 1) +
+      '. ' +
+      item.q +
+      '</h3>';
+
+
+    item.options.forEach(function(option, optionIndex) {
+
+      const letter =
+        String.fromCharCode(97 + optionIndex);
+
+
+      html +=
+        '<label class="option">' +
+
+        '<input type="radio" ' +
+        'name="q' + (index + 1) + '" ' +
+        'value="' + letter + '">' +
+
+        letter.toUpperCase() +
+        '. ' +
+        option +
+
+        '</label>';
+
+    });
+
+
+    html += '</div>';
+
+    container.innerHTML += html;
+
+  });
+
+}
+
+
+/* =====================================================
+   HITUNG NILAI
+===================================================== */
+
+function calculateScore() {
+
+  let score = 0;
+  let answered = 0;
+
+
+  questions.forEach(function(item, index) {
+
+    const selected =
+      document.querySelector(
+        'input[name="q' + (index + 1) + '"]:checked'
+      );
+
+
+    if (selected) {
+
+      answered++;
+
+      if (selected.value === item.answer) {
+        score++;
+      }
+
+    }
+
+  });
+
+
+  if (answered < questions.length) {
+
+    alert(
+      "Jawab semua soal terlebih dahulu ya!"
+    );
+
+    return;
+  }
+
+
+  const finalScore =
+    Math.round(
+      (score / questions.length) * 100
+    );
+
+
+  localStorage.setItem(
+    "sadDarsanaScore",
+    finalScore
+  );
+
+
+  showScore(finalScore);
+
+  go("score");
+
+}
+
+
+/* =====================================================
+   TAMPILKAN SKOR
+===================================================== */
+
+function showScore(score) {
+
+  document.getElementById("scoreNumber")
+    .textContent = score;
+
+
+  let message;
+
+
+  if (score >= 90) {
+
+    message =
+      "🌟 Luar biasa! Pemahaman kamu tentang Sad Darsana sangat baik.";
+
+  } else if (score >= 75) {
+
+    message =
+      "👏 Bagus! Kamu sudah memahami sebagian besar materi.";
+
+  } else if (score >= 60) {
+
+    message =
+      "💪 Cukup baik! Coba pelajari kembali bagian materi yang masih kurang.";
+
+  } else {
+
+    message =
+      "📚 Jangan menyerah! Pelajari kembali materi lalu coba lagi.";
+
+  }
+
+
+  document.getElementById("scoreMessage")
+    .textContent = message;
+
+}
+
+
+/* =====================================================
+   REFLEKSI
+===================================================== */
+
+function saveReflection() {
+
+  const value =
+    document.getElementById("reflection")
+      .value.trim();
+
+
+  if (!value) {
+
+    alert(
+      "Tuliskan refleksi kamu terlebih dahulu."
+    );
+
+    return;
+  }
+
+
+  localStorage.setItem(
+    "sadDarsanaReflection",
+    value
+  );
+
+
+  document.getElementById("reflectionMessage")
+    .textContent =
+      "✅ Refleksi berhasil disimpan.";
+
+}
+
+
+/* =====================================================
+   INISIALISASI
+===================================================== */
+
+loadQuiz();
+
+setMateri("nyaya");
+
+
+const savedScore =
+  localStorage.getItem("sadDarsanaScore");
+
+
+if (savedScore !== null) {
+  showScore(savedScore);
+}
+
+
+const savedReflection =
+  localStorage.getItem("sadDarsanaReflection");
+
+
+if (savedReflection) {
+
+  document.getElementById("reflection")
+    .value = savedReflection;
+
+}
+
+
+updateProgress("home");
+
+</script>
+
 </body>
 </html>
